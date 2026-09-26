@@ -1,0 +1,1 @@
+{"description":"Dynamically generated terminal-style typing SVG for GitHub profile READMEs","devDependencies":{"wrangler":"^4.0.0"},"license":"MIT","name":"terminal-typing-svg","scripts":{"deploy":"wrangler deploy","dev":"wrangler dev","embed-font":"node scripts/embed-font.js"},"type":"module","version":"1.0.0"}
