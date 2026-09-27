@@ -1,7 +1,7 @@
 # ⌨️ Terminal Typing SVG
 
 <p align="center">
-  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo"><img src="https://terminal-typing-svg.vaidikv.workers.dev/?lines=%24%20whoami;terminal-typing-svg;%24%20cat%20mission.txt;beautiful%20typing%20animations%20for%20your%20README;no%20server.%20no%20php.%20just%20a%20url.&theme=tokyonight" alt="Typing demo"></a>
+  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo"><img src="https://terminal-typing-svg.vaidikv.workers.dev/?lines=%24%20whoami;terminal-typing-svg;%24%20cat%20mission.txt;beautiful%20typing%20animations%20for%20your%20README;no%20server.%20no%20php.%20just%20a%20url." alt="Typing demo"></a>
 </p>
 
 <p align="center">
@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark" alt="GitHub contribution heatmap"></a>
+  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark&v=2" alt="GitHub contribution heatmap"></a>
 </p>
 
 <p align="center">
