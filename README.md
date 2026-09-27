@@ -1,20 +1,24 @@
-# Terminal Typing SVG
+# ⌨️ Terminal Typing SVG
 
-A dynamically generated, terminal-style typing animation for your GitHub profile README. Give it lines of text, get back an SVG that types them like commands in a macOS-style terminal window: colored prompt, typed commands, fading outputs, blinking block cursor.
+[![Typing demo](https://terminal-typing-svg.vaidikv.workers.dev/?lines=%24%20whoami;terminal-typing-svg;%24%20cat%20mission.txt;beautiful%20typing%20animations%20for%20your%20README;no%20server.%20no%20php.%20just%20a%20url.&theme=tokyonight)](https://terminal-typing-svg.vaidikv.workers.dev/demo)
 
-Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene with a hosted generator anyone can use.
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/VaidikV/terminal-typing-svg/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/VaidikV/terminal-typing-svg?style=flat)](https://github.com/VaidikV/terminal-typing-svg/stargazers)
+[![Live demo](https://img.shields.io/badge/demo-live-blue)](https://terminal-typing-svg.vaidikv.workers.dev/demo)
 
-**[Try the live demo](https://terminal-typing-svg.vaidikv.workers.dev/demo)**
+A terminal-style typing animation for your GitHub profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor.
 
-## Quick start
+Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene on serverless infrastructure: no PHP server to babysit.
 
-Paste this into your profile README (replace the `lines` with your own):
+## ⚡ Quick setup
+
+1. Copy-paste the markdown below into your GitHub profile README.
+2. Replace the value after `?lines=` with your text. Separate lines with semicolons and use `%20` for spaces. A line starting with `$ ` is typed as a command, any other line is printed as its output.
+3. Tweak it visually on the [demo page](https://terminal-typing-svg.vaidikv.workers.dev/demo): live preview, themes, fonts, then copy the markdown.
 
 ```md
 [![Typing SVG](https://terminal-typing-svg.vaidikv.workers.dev/?lines=$%20whoami;Backend%20engineer;$%20cat%20focus.txt;AI%20+%20LLM%20integration)](https://github.com/VaidikV/terminal-typing-svg)
 ```
-
-The easiest way to build your URL is the [demo page](https://terminal-typing-svg.vaidikv.workers.dev/demo): type, tweak, preview live, copy the markdown.
 
 ## How `lines` works
 
