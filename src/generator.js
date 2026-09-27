@@ -237,3 +237,20 @@ export function errorSVG(message) {
 }
 
 export { THEME_NAMES };
+
+// Shared building blocks for other terminal widgets (e.g. the stats card).
+export {
+  THEMES,
+  FONT_B64,
+  FONT_STACK_BASE,
+  DEFAULTS,
+  CHROME_H,
+  CONTENT_TOP,
+  LINE_H,
+  PAD_X,
+  esc,
+  checkColor,
+  checkPositiveInt,
+  checkBool,
+  fontFaceCSS,
+};
