@@ -178,14 +178,15 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     ));
   });
 
-  // Fresh prompt. The blinking cursor only appears in static mode;
-  // the animated card has no cursor.
-  const cursor = animated
-    ? ""
-    : `<tspan fill="${p.t.accent}">\u2588` +
-      `<animate attributeName="opacity" values="1;0" keyTimes="0;0.5" calcMode="discrete" ` +
-      `dur="1.06s" repeatCount="indefinite" begin="0s"/>` +
-      `</tspan>`;
+  // Fresh prompt with blinking cursor. In the animated card it appears
+  // once the stats have faded in; in static mode it blinks from the start.
+  const cursorBegin = animated ? `tpa0.begin+${tPrompt2}ms` : "0s";
+  const cursorEnd = animated ? ` end="tpa0.begin+${totalDur - FADE}ms"` : "";
+  const cursor =
+    `<tspan fill="${p.t.accent}">\u2588` +
+    `<animate attributeName="opacity" values="1;0" keyTimes="0;0.5" calcMode="discrete" ` +
+    `dur="1.06s" repeatCount="indefinite" begin="${cursorBegin}"${cursorEnd}/>` +
+    `</tspan>`;
   parts.push(show(
     `      <text x="${PAD_X}" y="${yPrompt2}" font-family="${stack}" font-size="${fs}">${promptTspans(cursor)}</text>`,
     tPrompt2, 200
