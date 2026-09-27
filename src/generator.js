@@ -93,7 +93,7 @@ export function buildParams(query) {
   // per-request color overrides
   for (const k of [
     "bg1", "bg2", "border", "promptUser", "promptPath",
-    "promptDollar", "command", "output", "accent", "titleColor",
+    "promptDollar", "command", "output", "accent", "titleColor", "dots",
   ]) {
     const target = k === "titleColor" ? "title" : k;
     if (q.get(k)) t[target] = checkColor(q.get(k), t[target]);
