@@ -116,7 +116,8 @@ export function generateHeatmapSVG(username, days, rawQuery) {
   );
   parts.push(
     `  <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="10" ` +
-      `fill="${p.t.bg1}" stroke="${p.t.border}"/>`
+      // bg2 (the deeper canvas) so empty day squares stay visible, like GitHub.
+      `fill="${p.t.bg2}" stroke="${p.t.border}"/>`
   );
   parts.push(
     `  <text x="${pad}" y="${pad + 13}" font-family="${SANS}" font-size="13">` +
