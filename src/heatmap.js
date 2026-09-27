@@ -1,7 +1,9 @@
 // Contribution heatmap card. Pure function of parsed contribution days ->
-// animated SVG string. No I/O. Days: [{date: "YYYY-MM-DD", count, level}].
+// SVG string. No I/O. Days: [{date: "YYYY-MM-DD", count, level}].
 // Level is GitHub's 0-4 intensity bucket; count is the exact contributions.
-// Uses a system sans stack on purpose: this card is not a terminal.
+// Layout: stats panel on the left, contribution grid on the right with a
+// gradient fade dissolving it into the card. Uses a system sans stack on
+// purpose: this card is not a terminal.
 import { buildParams, esc } from "./generator.js";
 
 const SANS = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif`;
@@ -55,8 +57,10 @@ export function generateHeatmapSVG(username, days, rawQuery) {
     }
   });
 
-  // Totals over the visible window; streak over all data.
-  const total = grid.flat().reduce((s, c) => s + (c ? c.count : 0), 0);
+  // Stats: total + streak + active days over the visible window.
+  const flat = grid.flat().filter(Boolean);
+  const total = flat.reduce((s, c) => s + c.count, 0);
+  const activeDays = flat.filter((c) => c.count > 0).length;
   let streak = 0;
   const cursor = new Date(days[days.length - 1].date + "T00:00:00");
   if ((byDate.get(iso(cursor)) || { count: 0 }).count === 0) {
@@ -66,19 +70,29 @@ export function generateHeatmapSVG(username, days, rawQuery) {
     streak++;
     cursor.setDate(cursor.getDate() - 1);
   }
+  const stats = [
+    { value: total.toLocaleString("en-US"), label: "contributions" },
+    { value: String(streak), label: "day streak" },
+    { value: String(activeDays), label: "active days" },
+  ];
 
-  // Layout.
+  // Layout: stats left, grid right with a fade.
   const sq = 11;
   const gap = 3;
   const step = sq + gap;
   const gridW = WEEKS * step - gap;
   const gridH = 7 * step - gap;
   const pad = 20;
-  const gy = pad + 48;
-  const statsX = pad + gridW + 30;
-  const width = Math.ceil(statsX + 118);
-  const legendY = gy + gridH + 26;
-  const height = Math.ceil(legendY + 22);
+  const statsW = 118;
+  const statsX = pad;
+  const statTop = pad + 40;
+  const blockH = 56;
+  const statsBottom = statTop + stats.length * blockH;
+  const gridX = statsX + statsW + 30;
+  const gy = statTop + Math.max(0, (statsBottom - statTop - gridH) / 2);
+  const width = Math.ceil(gridX + gridW + pad);
+  const legendY = gy + gridH + 24;
+  const height = Math.ceil(Math.max(statsBottom, legendY) + pad);
   const muted = p.t.output;
 
   const parts = [];
@@ -88,17 +102,44 @@ export function generateHeatmapSVG(username, days, rawQuery) {
       `viewBox="0 0 ${width} ${height}" role="img">`
   );
   parts.push(
+    `  <defs>\n` +
+      `    <linearGradient id="gridFade" x1="0" y1="0" x2="1" y2="0">\n` +
+      `      <stop offset="0" stop-color="#ffffff" stop-opacity="1"/>\n` +
+      `      <stop offset="0.62" stop-color="#ffffff" stop-opacity="1"/>\n` +
+      `      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>\n` +
+      `    </linearGradient>\n` +
+      `    <mask id="gridMask">\n` +
+      `      <rect x="${gridX}" y="${gy - 20}" width="${gridW}" height="${gridH + 20}" ` +
+      `fill="url(#gridFade)"/>\n` +
+      `    </mask>\n` +
+      `  </defs>`
+  );
+  parts.push(
     `  <rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="10" ` +
       `fill="${p.t.bg1}" stroke="${p.t.border}"/>`
   );
   parts.push(
     `  <text x="${pad}" y="${pad + 13}" font-family="${SANS}" font-size="13">` +
       `<tspan font-weight="700" fill="${p.t.title}">${esc(username)}</tspan>` +
-      `<tspan fill="${muted}" opacity="0.6"> \u00b7 contributions \u00b7 last ${WEEKS} weeks</tspan></text>`
+      `<tspan fill="${muted}" opacity="0.6"> \u00b7 last ${WEEKS} weeks</tspan></text>`
   );
+
+  // Stats panel.
+  stats.forEach((s, i) => {
+    const y0 = statTop + i * blockH;
+    parts.push(
+      `  <text x="${statsX}" y="${y0 + 28}" font-family="${SANS}" font-size="26" ` +
+        `font-weight="800" fill="${p.t.title}">${s.value}</text>\n` +
+        `  <text x="${statsX}" y="${y0 + 46}" font-family="${SANS}" font-size="11" ` +
+        `fill="${muted}" opacity="0.6">${s.label}</text>`
+    );
+  });
+
+  // Grid, faded into the card.
+  parts.push(`  <g mask="url(#gridMask)">`);
   labels.forEach((l) => {
     parts.push(
-      `  <text x="${pad + l.ci * step}" y="${pad + 37}" font-family="${SANS}" ` +
+      `    <text x="${gridX + l.ci * step}" y="${gy - 8}" font-family="${SANS}" ` +
         `font-size="9" fill="${muted}" opacity="0.55">${l.text}</text>`
     );
   });
@@ -106,26 +147,15 @@ export function generateHeatmapSVG(username, days, rawQuery) {
     col.forEach((cell, ri) => {
       if (!cell) return;
       parts.push(
-        `  <rect x="${pad + ci * step}" y="${gy + ri * step}" width="${sq}" height="${sq}" ` +
+        `    <rect x="${gridX + ci * step}" y="${gy + ri * step}" width="${sq}" height="${sq}" ` +
           `rx="2" fill="${scale[Math.min(4, cell.level)]}"/>`
       );
     });
   });
-
-  // Stats column.
-  parts.push(
-    `  <text x="${statsX}" y="${gy + 38}" font-family="${SANS}" font-size="30" ` +
-      `font-weight="800" fill="${p.t.title}">${total.toLocaleString("en-US")}</text>\n` +
-      `  <text x="${statsX}" y="${gy + 56}" font-family="${SANS}" font-size="11" ` +
-      `fill="${muted}" opacity="0.6">contributions</text>\n` +
-      `  <text x="${statsX}" y="${gy + 92}" font-family="${SANS}" font-size="17" ` +
-      `font-weight="700" fill="${p.t.accent}">${streak}</text>\n` +
-      `  <text x="${statsX}" y="${gy + 108}" font-family="${SANS}" font-size="11" ` +
-      `fill="${muted}" opacity="0.6">day streak</text>`
-  );
+  parts.push(`  </g>`);
 
   // Less -> More legend.
-  let lx = pad;
+  let lx = gridX;
   parts.push(
     `  <text x="${lx}" y="${legendY}" font-family="${SANS}" font-size="10" ` +
       `fill="${muted}" opacity="0.6">Less</text>`
