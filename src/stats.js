@@ -149,12 +149,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     const begin = repeat ? `0s;outro.end+${RESTART_GAP}ms` : "0s";
     const tspans =
       promptTspans("") +
-      `<tspan fill="${p.t.command}" font-weight="600">${esc(cmd)}</tspan>` +
-      `<tspan fill="${p.t.accent}">\u2588` +
-      `<animate attributeName="opacity" values="1;0" keyTimes="0;0.5" calcMode="discrete" ` +
-      `dur="1.06s" repeatCount="indefinite" ` +
-      `begin="tpa0.begin+${typeDur}ms" end="tpa0.begin+${typeDur + 250}ms"/>` +
-      `</tspan>`;
+      `<tspan fill="${p.t.command}" font-weight="600">${esc(cmd)}</tspan>`;
     parts.push(
       `    <path id="tp0" d="${d0}" fill="none">\n` +
         `      <animate id="tpa0" attributeName="d" begin="${begin}" dur="${totalDur}ms" fill="freeze"\n` +
@@ -183,14 +178,14 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     ));
   });
 
-  // Fresh prompt with blinking cursor.
-  const cursorBegin = animated ? `tpa0.begin+${tPrompt2}ms` : "0s";
-  const cursorEnd = animated ? ` end="tpa0.begin+${totalDur - FADE}ms"` : "";
-  const cursor =
-    `<tspan fill="${p.t.accent}">\u2588` +
-    `<animate attributeName="opacity" values="1;0" keyTimes="0;0.5" calcMode="discrete" ` +
-    `dur="1.06s" repeatCount="indefinite" begin="${cursorBegin}"${cursorEnd}/>` +
-    `</tspan>`;
+  // Fresh prompt. The blinking cursor only appears in static mode;
+  // the animated card has no cursor.
+  const cursor = animated
+    ? ""
+    : `<tspan fill="${p.t.accent}">\u2588` +
+      `<animate attributeName="opacity" values="1;0" keyTimes="0;0.5" calcMode="discrete" ` +
+      `dur="1.06s" repeatCount="indefinite" begin="0s"/>` +
+      `</tspan>`;
   parts.push(show(
     `      <text x="${PAD_X}" y="${yPrompt2}" font-family="${stack}" font-size="${fs}">${promptTspans(cursor)}</text>`,
     tPrompt2, 200
