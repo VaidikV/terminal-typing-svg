@@ -125,12 +125,11 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
   // Left: compact profile stats, less verbose than the profile card.
   const rows = [
     [profile?.stars, "stars"],
-    [profile?.commits, "commits"],
     [profile?.prs, "PRs"],
     [profile?.issues, "issues"],
   ];
   rows.forEach(([value, label], i) => {
-    const y = 96 + i * 34;
+    const y = 108 + i * 38;
     parts.push(
       `  <text x="${ROWS_X}" y="${y}" font-family="${SANS}" font-size="15">` +
         `<tspan font-weight="700" fill="${p.t.title}">${fmt(value)}</tspan>` +
