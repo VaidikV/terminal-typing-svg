@@ -19,17 +19,6 @@ import {
   buildParams,
 } from "./generator.js";
 
-const LANG_COLORS = {
-  Python: "#3572A5", TypeScript: "#3178c6", JavaScript: "#f1e05a",
-  Go: "#00ADD8", Rust: "#dea584", Java: "#b07219", "C++": "#f34b7d",
-  C: "#555555", "C#": "#178600", Ruby: "#701516", PHP: "#4F5D95",
-  Swift: "#F05138", Kotlin: "#A97BFF", HTML: "#e34c26", CSS: "#563d7c",
-  Shell: "#89e051", Dockerfile: "#384d54", Vue: "#41b883", Dart: "#00B4AB",
-  "Jupyter Notebook": "#DA5B0B", R: "#198CE7", Scala: "#c22d40",
-  Lua: "#000080", Perl: "#0298c3", Haskell: "#5e5086", Elixir: "#6e4a7e",
-  Zig: "#ec915c", "Objective-C": "#438eff",
-};
-
 const STAT_DEFS = [
   ["Stars earned", "stars", "star"],
   ["Repositories", "repos", "repo"],
@@ -40,9 +29,6 @@ const STAT_DEFS = [
 
 const FADE = 500;
 const RESTART_GAP = 600;
-const BAR_W = 10; // bar width in characters
-const FULL = "\u2588"; // █
-const LIGHT = "\u2591"; // ░
 const ICON = 15; // icon box px
 
 const ICON_PATHS = {
@@ -52,10 +38,6 @@ const ICON_PATHS = {
   issue: `<circle cx="8" cy="8" r="5.5"/><path d="M8 5.2v3.2"/><circle cx="8" cy="11.2" r="1.1" fill="ACCENT" stroke="none"/>`,
   person: `<circle cx="8" cy="5.3" r="2.6"/><path d="M3.2 13.6c.6-3 2.4-4.4 4.8-4.4s4.2 1.4 4.8 4.4"/>`,
 };
-
-export function langColor(name, fallback) {
-  return LANG_COLORS[name] || fallback;
-}
 
 export function generateStatsSVG(data, rawQuery, opts = {}) {
   const fontFamily = (opts.fontFamily || "JetBrains Mono").replace(/["<>]/g, "");
@@ -85,37 +67,24 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     icon,
     value: Number(data[key] || 0).toLocaleString("en-US"),
   }));
-  const langs = (data.langs || []).slice(0, 5).map((l) => ({
-    name: String(l.name).slice(0, 24),
-    count: Number(l.count) || 0,
-    color: langColor(l.name, p.t.accent),
-  }));
-  const maxLang = Math.max(1, ...langs.map((l) => l.count));
-  const nameCol = Math.max(0, ...langs.map((l) => l.name.length));
 
-  // ---- layout ----
-  const COL2_X = 300;
+  // ---- layout: single minimal column ----
   const yCmd = 72;
   const yStat = (i) => 102 + i * 26;
-  const yLangLabel = 102;
-  const yLang = (j) => 128 + j * 26;
-  const yPrompt2 = 258;
+  const yPrompt2 = 232;
   const height = yPrompt2 + 34;
 
   const labelX = PAD_X + ICON + 9;
   const maxLabelW = Math.max(...stats.map((s) => s.label.length)) * adv;
   const valueX = Math.ceil(labelX + maxLabelW + 18);
-  const barX = COL2_X + nameCol * adv + 12;
-  const countX = Math.ceil(barX + (BAR_W + 1) * adv + 10);
-  const width = Math.max(560, p.minWidth, Math.ceil(countX + 28));
+  const cmdLen = (promptText.length + cmd.length) * adv + PAD_X * 2 + 24;
+  const width = Math.max(380, p.minWidth, Math.ceil(cmdLen));
 
   // ---- timeline (animated mode) ----
   const nTypeChars = promptText.length + cmd.length + 1;
   const typeDur = nTypeChars * p.typingSpeed;
   const tStat = (i) => typeDur + 250 + i * 130;
-  const tLangLabel = tStat(stats.length - 1) + 250;
-  const tLang = (j) => tLangLabel + 150 + j * 130;
-  const tPrompt2 = langs.length ? tLang(langs.length - 1) + 300 : tStat(stats.length - 1) + 300;
+  const tPrompt2 = tStat(stats.length - 1) + 300;
   const contentEnd = tPrompt2 + 150;
   const totalDur = contentEnd + hold + FADE;
   const k = (t) => (t / totalDur).toFixed(4);
@@ -209,26 +178,6 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
       tStat(i)
     ));
   });
-
-  // Top languages chart on the right.
-  if (langs.length) {
-    parts.push(show(
-      `      <text x="${COL2_X}" y="${yLangLabel}" font-family="${stack}" font-size="${fs}" font-weight="600" fill="${p.t.output}">Top languages</text>`,
-      tLangLabel, 120
-    ));
-    langs.forEach((l, j) => {
-      const filled = Math.max(1, Math.round((l.count / maxLang) * BAR_W));
-      const bar = FULL.repeat(filled) + LIGHT.repeat(BAR_W - filled);
-      const namePad = " ".repeat(nameCol - l.name.length);
-      parts.push(show(
-        `      <text x="${COL2_X}" y="${yLang(j)}" font-family="${stack}" font-size="${fs}">` +
-          `<tspan fill="${p.t.output}">${esc(l.name)}${namePad}  </tspan>` +
-          `<tspan fill="${l.color}">${bar}</tspan>` +
-          `<tspan fill="${p.t.accent}" font-weight="600"> ${l.count}</tspan></text>`,
-        tLang(j)
-      ));
-    });
-  }
 
   // Fresh prompt with blinking cursor.
   const cursorBegin = animated ? `tpa0.begin+${tPrompt2}ms` : "0s";
