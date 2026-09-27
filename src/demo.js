@@ -18,6 +18,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
   .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px;
     padding: 24px; margin-bottom: 20px; }
   .card h2 { font-size: 16px; margin: 0 0 16px; color: #e6edf3; }
+  .card h3 { font-size: 14px; margin: 28px 0 12px; color: #e6edf3; }
   label { display: block; font-size: 13px; color: #8b949e; margin: 14px 0 6px; }
   label:first-child { margin-top: 0; }
   textarea, input[type=text], input[type=number], select {
@@ -70,7 +71,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
   Separate lines with <code>;</code>. Inspired by
   <a href="https://github.com/DenverCoder1/readme-typing-svg" style="color:#58a6ff">readme-typing-svg</a>.</p>
   <p class="new">✨ New: <a href="#stats" style="color:#58a6ff">GitHub stats cards</a>,
-  terminal and heatmap styles. Try one below.</p>
+  terminal stats and contribution heatmap. Try them below.</p>
 
   <div class="card">
     <h2>Live preview</h2>
@@ -146,15 +147,6 @@ export const DEMO_HTML = `<!DOCTYPE html>
         <input type="text" id="s_username" value="User" spellcheck="false">
       </div>
       <div>
-        <label for="s_style">Style</label>
-        <select id="s_style">
-          <option value="heatmap" selected>Heatmap (contribution graph)</option>
-          <option value="terminal">Terminal (animated gh stats)</option>
-        </select>
-      </div>
-    </div>
-    <div class="row">
-      <div>
         <label for="s_theme">Theme</label>
         <select id="s_theme">
           <option value="github-dark" selected>GitHub Dark</option>
@@ -165,12 +157,20 @@ export const DEMO_HTML = `<!DOCTYPE html>
         </select>
       </div>
     </div>
-    <label style="margin-top:16px">Live preview</label>
-    <img id="s_preview" alt="Stats card preview" style="max-width:100%;height:auto;display:block;background:#0d1117;border-radius:8px">
+
+    <h3>Terminal</h3>
+    <img id="s_preview_terminal" alt="Terminal stats preview" style="max-width:100%;height:auto;display:block;background:#0d1117;border-radius:8px">
     <label style="margin-top:16px">Image URL</label>
-    <div class="out"><pre id="s_url"></pre><button class="copy" data-for="s_url">Copy</button></div>
+    <div class="out"><pre id="s_url_terminal"></pre><button class="copy" data-for="s_url_terminal">Copy</button></div>
     <label style="margin-top:16px">Markdown for your README</label>
-    <div class="out"><pre id="s_md"></pre><button class="copy" data-for="s_md">Copy</button></div>
+    <div class="out"><pre id="s_md_terminal"></pre><button class="copy" data-for="s_md_terminal">Copy</button></div>
+
+    <h3>Heatmap</h3>
+    <img id="s_preview_heatmap" alt="Heatmap preview" style="max-width:100%;height:auto;display:block;background:#0d1117;border-radius:8px">
+    <label style="margin-top:16px">Image URL</label>
+    <div class="out"><pre id="s_url_heatmap"></pre><button class="copy" data-for="s_url_heatmap">Copy</button></div>
+    <label style="margin-top:16px">Markdown for your README</label>
+    <div class="out"><pre id="s_md_heatmap"></pre><button class="copy" data-for="s_md_heatmap">Copy</button></div>
   </div>
 
   <footer>
@@ -215,7 +215,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
     els[k].addEventListener("input", refresh);
     els[k].addEventListener("change", refresh);
   });
-  document.querySelectorAll(".copy").forEach(function (btn) {
+  document.querySelectorAll('.copy[data-for="url"], .copy[data-for="md"]').forEach(function (btn) {
     btn.addEventListener("click", function () {
       var t = document.getElementById(btn.getAttribute("data-for")).textContent;
       navigator.clipboard.writeText(t).then(function () {
@@ -228,29 +228,29 @@ export const DEMO_HTML = `<!DOCTYPE html>
 })();
 (function () {
   var username = document.getElementById("s_username");
-  var style = document.getElementById("s_style");
   var theme = document.getElementById("s_theme");
-  function buildURL() {
+  var names = { terminal: "GitHub stats", heatmap: "GitHub contribution heatmap" };
+  function buildURL(style) {
     var p = new URLSearchParams();
     p.set("username", username.value.trim() || "User");
-    if (style.value !== "terminal") p.set("style", style.value);
+    if (style !== "terminal") p.set("style", style);
     if (theme.value !== "github-dark") p.set("theme", theme.value);
     return location.origin + "/stats?" + p.toString();
   }
   function refreshStats() {
-    var u = buildURL();
-    var names = { heatmap: "GitHub contribution heatmap", terminal: "GitHub stats" };
-    document.getElementById("s_preview").src = u;
-    document.getElementById("s_url").textContent = u;
-    document.getElementById("s_md").textContent =
-      "[![" + names[style.value] + "](" + u + ")](https://github.com/VaidikV/terminal-typing-svg)";
+    ["terminal", "heatmap"].forEach(function (style) {
+      var u = buildURL(style);
+      document.getElementById("s_preview_" + style).src = u;
+      document.getElementById("s_url_" + style).textContent = u;
+      document.getElementById("s_md_" + style).textContent =
+        "[![" + names[style] + "](" + u + ")](https://github.com/VaidikV/terminal-typing-svg)";
+    });
   }
-  [username, style, theme].forEach(function (el) {
+  [username, theme].forEach(function (el) {
     el.addEventListener("input", refreshStats);
     el.addEventListener("change", refreshStats);
   });
-  document.querySelectorAll(".copy").forEach(function (btn) {
-    if (btn.getAttribute("data-for").indexOf("s_") !== 0) return;
+  document.querySelectorAll('.copy[data-for^="s_"]').forEach(function (btn) {
     btn.addEventListener("click", function () {
       var t = document.getElementById(btn.getAttribute("data-for")).textContent;
       navigator.clipboard.writeText(t).then(function () {
