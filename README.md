@@ -6,7 +6,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/VaidikV/terminal-typing-svg?style=flat)](https://github.com/VaidikV/terminal-typing-svg/stargazers)
 [![Live demo](https://img.shields.io/badge/demo-live-blue)](https://terminal-typing-svg.vaidikv.workers.dev/demo)
 
-A terminal-style typing animation for your GitHub profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor.
+A terminal-style typing animation for your GitHub profile README. A readme typing SVG generator with a real terminal look: give it lines of text, get back an SVG that types them like commands in a macOS terminal window, with a colored prompt, typed commands, fading outputs, and a blinking block cursor.
 
 Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene on serverless infrastructure: no PHP server to babysit.
 
