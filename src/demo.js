@@ -69,8 +69,8 @@ export const DEMO_HTML = `<!DOCTYPE html>
   Prefix a line with <code>$&nbsp;</code> to type it as a command, following lines become its output.
   Separate lines with <code>;</code>. Inspired by
   <a href="https://github.com/DenverCoder1/readme-typing-svg" style="color:#58a6ff">readme-typing-svg</a>.</p>
-  <p class="new">✨ New: <a href="/stats?username=VaidikV" style="color:#58a6ff">terminal-style GitHub stats</a>,
-  try <code>/stats?username=yourname</code></p>
+  <p class="new">✨ New: <a href="#stats" style="color:#58a6ff">GitHub stats cards</a>,
+  terminal, heatmap, dashboard, blueprint. Try one below.</p>
 
   <div class="card">
     <h2>Live preview</h2>
@@ -138,6 +138,43 @@ export const DEMO_HTML = `<!DOCTYPE html>
     <div class="out"><pre id="md"></pre><button class="copy" data-for="md">Copy</button></div>
   </div>
 
+  <div class="card" id="stats">
+    <h2>Stats cards</h2>
+    <div class="row">
+      <div>
+        <label for="s_username">GitHub username</label>
+        <input type="text" id="s_username" value="VaidikV" spellcheck="false">
+      </div>
+      <div>
+        <label for="s_style">Style</label>
+        <select id="s_style">
+          <option value="heatmap" selected>Heatmap (contribution graph)</option>
+          <option value="terminal">Terminal (animated gh stats)</option>
+          <option value="dashboard">Dashboard (minimal numbers)</option>
+          <option value="blueprint">Blueprint (engineering drawing)</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="s_theme">Theme</label>
+        <select id="s_theme">
+          <option value="github-dark" selected>GitHub Dark</option>
+          <option value="tokyonight">Tokyo Night</option>
+          <option value="dracula">Dracula</option>
+          <option value="monokai">Monokai</option>
+          <option value="github-light">GitHub Light</option>
+        </select>
+      </div>
+    </div>
+    <label style="margin-top:16px">Live preview</label>
+    <img id="s_preview" alt="Stats card preview" style="width:100%;height:auto;display:block;background:#0d1117;border-radius:8px">
+    <label style="margin-top:16px">Image URL</label>
+    <div class="out"><pre id="s_url"></pre><button class="copy" data-for="s_url">Copy</button></div>
+    <label style="margin-top:16px">Markdown for your README</label>
+    <div class="out"><pre id="s_md"></pre><button class="copy" data-for="s_md">Copy</button></div>
+  </div>
+
   <footer>
     Built by <a href="https://github.com/VaidikV">VaidikV</a> - MIT licensed -
     <a href="https://github.com/VaidikV/terminal-typing-svg">source on GitHub</a>
@@ -190,6 +227,40 @@ export const DEMO_HTML = `<!DOCTYPE html>
     });
   });
   refresh();
+})();
+(function () {
+  var username = document.getElementById("s_username");
+  var style = document.getElementById("s_style");
+  var theme = document.getElementById("s_theme");
+  function buildURL() {
+    var p = new URLSearchParams();
+    p.set("username", username.value.trim() || "VaidikV");
+    if (style.value !== "terminal") p.set("style", style.value);
+    if (theme.value !== "github-dark") p.set("theme", theme.value);
+    return location.origin + "/stats?" + p.toString();
+  }
+  function refreshStats() {
+    var u = buildURL();
+    document.getElementById("s_preview").src = u;
+    document.getElementById("s_url").textContent = u;
+    document.getElementById("s_md").textContent =
+      "[![GitHub stats](" + u + ")](https://github.com/VaidikV/terminal-typing-svg)";
+  }
+  [username, style, theme].forEach(function (el) {
+    el.addEventListener("input", refreshStats);
+    el.addEventListener("change", refreshStats);
+  });
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    if (btn.getAttribute("data-for").indexOf("s_") !== 0) return;
+    btn.addEventListener("click", function () {
+      var t = document.getElementById(btn.getAttribute("data-for")).textContent;
+      navigator.clipboard.writeText(t).then(function () {
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = "Copy"; }, 1500);
+      });
+    });
+  });
+  refreshStats();
 })();
 </script>
 </body>
