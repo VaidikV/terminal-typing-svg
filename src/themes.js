@@ -10,7 +10,7 @@ export const THEMES = {
   "tokyonight": {
     bg1: "#1a1b26", bg2: "#16161e", border: "#2f3549", divider: "#24283b",
     promptUser: "#9ece6a", promptPath: "#7aa2f7", promptDollar: "#565f89",
-    command: "#c0caf5", output: "#565f89", accent: "#7aa2f7",
+    command: "#c0caf5", output: "#a9b1d6", accent: "#7aa2f7",
     title: "#565f89",
   },
   "dracula": {
