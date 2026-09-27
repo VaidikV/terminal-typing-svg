@@ -47,6 +47,8 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   const repeat = checkBool(q.get("repeat"), DEFAULTS.repeat);
   const hold = checkPositiveInt(q.get("hold"), 4000);
   const animated = checkBool(q.get("animate"), true);
+  const demoMode = q.get("demo") === "1";
+  const titleText = demoMode ? `${p.title} \u00b7 sample` : p.title;
   const endV = repeat ? "0" : "1";
   const fs = p.fontSize;
   const adv = fs * 0.6;
@@ -125,7 +127,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
       `  <circle cx="28" cy="23" r="6" fill="#ff5f57"/>\n` +
       `  <circle cx="48" cy="23" r="6" fill="#febc2e"/>\n` +
       `  <circle cx="68" cy="23" r="6" fill="#28c840"/>\n` +
-      `  <text x="92" y="28" font-family="${stack}" font-size="12" fill="${p.t.title}">${esc(p.title)}</text>\n` +
+      `  <text x="92" y="28" font-family="${stack}" font-size="12" fill="${p.t.title}">${esc(titleText)}</text>\n` +
       `  <line x1="12" y1="${CHROME_H}" x2="${width - 12}" y2="${CHROME_H}" stroke="${p.t.divider}"/>`
   );
 
