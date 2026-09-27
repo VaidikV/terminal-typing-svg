@@ -66,7 +66,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
       Star on GitHub
     </a>
   </div>
-  <p class="sub">A dynamically generated, terminal-style typing animation for your GitHub profile README.
+  <p class="sub">Animated terminal typing SVGs and GitHub stats cards for your README.
   Prefix a line with <code>$&nbsp;</code> to type it as a command, following lines become its output.
   Separate lines with <code>;</code>. Inspired by
   <a href="https://github.com/DenverCoder1/readme-typing-svg" style="color:#58a6ff">readme-typing-svg</a>.</p>
