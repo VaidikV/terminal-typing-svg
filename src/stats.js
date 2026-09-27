@@ -2,9 +2,9 @@
 // params -> animated SVG string. No I/O. Shares the terminal chrome, themes,
 // and fonts with the typing generator.
 //
-// Sequence: the command types, a spinner "fetches" from the API, stat rows
-// print like real terminal output with dotted leaders, a top-languages donut
-// draws itself with a legend, then a fresh prompt blinks until the loop.
+// Designed to look like real terminal output (neofetch-style): the command
+// types, a spinner "fetches" from the API, then stat rows and a colored
+// ASCII bar chart print line by line, exactly as a CLI would render them.
 import {
   THEMES,
   FONT_STACK_BASE,
@@ -41,15 +41,12 @@ const STAT_DEFS = [
 
 const FADE = 500;
 const RESTART_GAP = 600;
-const LEADER_COL = 30; // monospace columns for dotted leaders
 const SPINNER = ["|", "/", "-", "\\"];
 const SPIN_STEP = 130;
 const SPIN_CYCLES = 2;
-const DONUT_R = 54;
-const DONUT_SW = 18;
-const SEG_GAP = 4;
-const SEG_DRAW = 550;
-const SEG_STAGGER = 380;
+const BAR_W = 14; // bar width in characters
+const FULL = "\u2588"; // █
+const LIGHT = "\u2591"; // ░
 
 export function langColor(name, fallback) {
   return LANG_COLORS[name] || fallback;
@@ -82,34 +79,21 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     count: Number(l.count) || 0,
     color: langColor(l.name, p.t.accent),
   }));
-  const langTotal = Math.max(1, langs.reduce((s, l) => s + l.count, 0));
+  const maxLang = Math.max(1, ...langs.map((l) => l.count));
+  const nameCol = Math.max(0, ...langs.map((l) => l.name.length));
 
-  // Dotted-leader stat lines, e.g. "Stars earned ............ 13"
-  const statLines = stats.map((s) => {
-    const dots = Math.max(2, LEADER_COL - s.label.length - s.value.length);
-    return { label: s.label, dots: ".".repeat(dots), value: s.value };
-  });
-
-  const width = Math.max(
-    620,
-    p.minWidth,
-    Math.ceil(
-      Math.max(promptText.length + cmd.length + 1, LEADER_COL + 8) * p.adv + PAD_X * 2
-    )
-  );
+  const width = Math.max(620, p.minWidth);
 
   // ---- layout ----
   const yCmd = CONTENT_TOP;
   const yFetch = CONTENT_TOP + LINE_H;
-  const yStat = (i) => CONTENT_TOP + (2 + i) * LINE_H;
-  const yPrompt2 = CONTENT_TOP + 8 * LINE_H;
-  const donutCX = width - 135;
-  const donutCY = CONTENT_TOP + 104;
-  const legX = width - 205;
-  const legY = (j) => CONTENT_TOP + 200 + j * 26;
-  const maxNameW = Math.max(0, ...langs.map((l) => l.name.length)) * p.adv;
-  const legCountX = legX + 20 + maxNameW + 14;
-  const height = Math.ceil(Math.max(yPrompt2, legY(langs.length - 1)) + 44);
+  const yHead = CONTENT_TOP + 2 * LINE_H;
+  const yDashes = CONTENT_TOP + 3 * LINE_H;
+  const yStat = (i) => CONTENT_TOP + (4 + i) * LINE_H;
+  const yLangLabel = CONTENT_TOP + 10 * LINE_H;
+  const yLang = (j) => CONTENT_TOP + (11 + j) * LINE_H;
+  const yPrompt2 = CONTENT_TOP + (langs.length ? 17 : 11) * LINE_H;
+  const height = Math.ceil(yPrompt2 + 44);
 
   // ---- timeline ----
   const nTypeChars = promptText.length + cmd.length + 1;
@@ -117,17 +101,16 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   const tFetch = typeDur + 250;
   const fetchDur = SPINNER.length * SPIN_STEP * SPIN_CYCLES;
   const tFetchEnd = tFetch + fetchDur;
-  const tStat = (i) => tFetchEnd + 120 + i * 150;
-  const tDonut = tFetchEnd + 120 + stats.length * 150;
-  const tSeg = (j) => tDonut + j * SEG_STAGGER;
-  const tCenter = tDonut + 250;
-  const tPrompt2 = tDonut + 500;
-  const contentEnd = langs.length ? tSeg(langs.length - 1) + SEG_DRAW : tStat(stats.length - 1) + 200;
+  const tHead = tFetchEnd + 120;
+  const tStat = (i) => tHead + 180 + i * 140;
+  const tLangLabel = tStat(stats.length - 1) + 300;
+  const tLang = (j) => tLangLabel + 180 + j * 170;
+  const tPrompt2 = langs.length ? tLang(langs.length - 1) + 400 : tStat(stats.length - 1) + 400;
+  const contentEnd = tPrompt2 + 200;
   const totalDur = contentEnd + hold + FADE;
   const k = (t) => (t / totalDur).toFixed(4);
   const kOut = k(totalDur - FADE);
 
-  // opacity window: invisible until tIn, visible over dur ms, out at the end
   const win = (tIn, dur) => ({
     values: `0;0;1;1;${endV}`,
     keyTimes: `0;${k(tIn)};${k(tIn + dur)};${kOut};1`,
@@ -181,12 +164,12 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
       `    </text>`
   );
 
-  // Spinner + fetching line (vanishes when the stats print).
-  const tHideFetch = tStat(0);
+  // Spinner + fetching line (vanishes when output prints).
+  const tHideFetch = tHead;
   parts.push(`    <g opacity="0">\n` +
     `      <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
-    `        values="0;0;1;1;0;0" keyTimes="0;${k(tFetch)};${k(tFetch + 80)};${k(tHideFetch)};${k(tHideFetch + 250)};1"/>` +
-    `\n      <text x="${PAD_X}" y="${yFetch}" font-family="${stack}" font-size="${p.fontSize}" fill="${p.t.output}">fetching stats from api.github.com </text>`);
+    `        values="0;0;1;1;0;0" keyTimes="0;${k(tFetch)};${k(tFetch + 80)};${k(tHideFetch)};${k(tHideFetch + 250)};1"/>\n` +
+    `      <text x="${PAD_X}" y="${yFetch}" font-family="${stack}" font-size="${p.fontSize}" fill="${p.t.output}">fetching stats from api.github.com </text>`);
   SPINNER.forEach((ch, f) => {
     const times = [];
     for (let r = 0; r < SPIN_CYCLES; r++) {
@@ -202,64 +185,58 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   });
   parts.push("    </g>");
 
-  // Stat rows print like real terminal output.
-  statLines.forEach((s, i) => {
+  // neofetch-style header: user@host + dashes.
+  const hw = win(tHead, 120);
+  const dashes = "-".repeat(p.prompt.length);
+  parts.push(
+    `    <g opacity="0">\n` +
+      `      <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
+      `        values="${hw.values}" keyTimes="${hw.keyTimes}"/>\n` +
+      `      <text x="${PAD_X}" y="${yHead}" font-family="${stack}" font-size="${p.fontSize}" font-weight="600" fill="${p.t.promptUser}">${esc(p.prompt)}</text>\n` +
+      `      <text x="${PAD_X}" y="${yDashes}" font-family="${stack}" font-size="${p.fontSize}" fill="${p.t.divider}">${dashes}</text>\n` +
+      `    </g>`
+  );
+
+  // Stat rows print like real command output: "Label: value".
+  stats.forEach((s, i) => {
     const w = win(tStat(i), 70);
     parts.push(
       `    <g opacity="0">\n` +
         `      <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
         `        values="${w.values}" keyTimes="${w.keyTimes}"/>\n` +
         `      <text x="${PAD_X}" y="${yStat(i)}" font-family="${stack}" font-size="${p.fontSize}">` +
-        `<tspan fill="${p.t.output}">${esc(s.label)} </tspan>` +
-        `<tspan fill="${p.t.output}" opacity="0.45">${s.dots} </tspan>` +
+        `<tspan fill="${p.t.output}">${esc(s.label)}: </tspan>` +
         `<tspan fill="${p.t.accent}" font-weight="600">${esc(s.value)}</tspan></text>\n` +
         `    </g>`
     );
   });
 
-  // Donut chart of top languages, drawn segment by segment.
+  // Top languages as a colored ASCII bar chart, exactly like a CLI would draw.
   if (langs.length) {
-    const C = 2 * Math.PI * DONUT_R;
+    const lw = win(tLangLabel, 120);
     parts.push(
-      `    <circle cx="${donutCX}" cy="${donutCY}" r="${DONUT_R}" fill="none" stroke="${p.t.divider}" stroke-width="${DONUT_SW}" opacity="0.45"/>`
+      `    <g opacity="0">\n` +
+        `      <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
+        `        values="${lw.values}" keyTimes="${lw.keyTimes}"/>\n` +
+        `      <text x="${PAD_X}" y="${yLangLabel}" font-family="${stack}" font-size="${p.fontSize}" font-weight="600" fill="${p.t.output}">Top languages</text>\n` +
+        `    </g>`
     );
-    let cum = 0;
     langs.forEach((l, j) => {
-      const frac = l.count / langTotal;
-      const segLen = Math.max(6, frac * C - SEG_GAP);
-      const angle = (-90 + cum * 360).toFixed(2);
-      cum += frac;
-      const t0 = tSeg(j);
-      parts.push(
-        `    <circle cx="${donutCX}" cy="${donutCY}" r="${DONUT_R}" fill="none" stroke="${l.color}" stroke-width="${DONUT_SW}"\n` +
-          `      stroke-dasharray="0 ${C.toFixed(2)}" transform="rotate(${angle} ${donutCX} ${donutCY})">\n` +
-          `      <animate attributeName="stroke-dasharray" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
-          `        values="0 ${C.toFixed(2)};0 ${C.toFixed(2)};${segLen.toFixed(2)} ${(C - segLen).toFixed(2)};${segLen.toFixed(2)} ${(C - segLen).toFixed(2)}"\n` +
-          `        keyTimes="0;${k(t0)};${k(t0 + SEG_DRAW)};1"/>\n` +
-          `    </circle>`
-      );
-      const lw = win(t0, 250);
+      const filled = Math.max(1, Math.round((l.count / maxLang) * BAR_W));
+      const bar = FULL.repeat(filled) + LIGHT.repeat(BAR_W - filled);
+      const namePad = " ".repeat(nameCol - l.name.length);
+      const w = win(tLang(j), 70);
       parts.push(
         `    <g opacity="0">\n` +
           `      <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
-          `        values="${lw.values}" keyTimes="${lw.keyTimes}"/>\n` +
-          `      <rect x="${legX}" y="${legY(j) - 9}" width="10" height="10" rx="2" fill="${l.color}"/>\n` +
-          `      <text x="${legX + 20}" y="${legY(j)}" font-family="${stack}" font-size="${p.fontSize}" fill="${p.t.output}">${esc(l.name)}</text>\n` +
-          `      <text x="${legCountX}" y="${legY(j)}" font-family="${stack}" font-size="${p.fontSize}" font-weight="600" fill="${p.t.accent}">${l.count}</text>\n` +
+          `        values="${w.values}" keyTimes="${w.keyTimes}"/>\n` +
+          `      <text x="${PAD_X}" y="${yLang(j)}" font-family="${stack}" font-size="${p.fontSize}">` +
+          `<tspan fill="${p.t.output}">${esc(l.name)}${namePad}  </tspan>` +
+          `<tspan fill="${l.color}">${bar}</tspan>` +
+          `<tspan fill="${p.t.accent}" font-weight="600"> ${l.count}</tspan></text>\n` +
           `    </g>`
       );
     });
-    // Center: top language share.
-    const top = langs[0];
-    const cw = win(tCenter, 300);
-    parts.push(
-      `    <g opacity="0" text-anchor="middle">\n` +
-        `      <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
-        `        values="${cw.values}" keyTimes="${cw.keyTimes}"/>\n` +
-        `      <text x="${donutCX}" y="${donutCY + 2}" font-family="${stack}" font-size="22" font-weight="600" fill="${p.t.accent}">${Math.round((top.count / langTotal) * 100)}%</text>\n` +
-        `      <text x="${donutCX}" y="${donutCY + 22}" font-family="${stack}" font-size="11" fill="${p.t.output}">${esc(top.name)}</text>\n` +
-        `    </g>`
-    );
   }
 
   // Fresh prompt, terminal ready for the next command.
