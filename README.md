@@ -2,6 +2,8 @@
 
 [![Typing demo](https://terminal-typing-svg.vaidikv.workers.dev/?lines=%24%20whoami;terminal-typing-svg;%24%20cat%20mission.txt;beautiful%20typing%20animations%20for%20your%20README;no%20server.%20no%20php.%20just%20a%20url.&theme=tokyonight)](https://terminal-typing-svg.vaidikv.workers.dev/demo)
 
+[![GitHub contribution heatmap](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark)](https://terminal-typing-svg.vaidikv.workers.dev/demo#stats)
+
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/VaidikV/terminal-typing-svg/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/VaidikV/terminal-typing-svg?style=flat)](https://github.com/VaidikV/terminal-typing-svg/stargazers)
 [![Live demo](https://img.shields.io/badge/demo-live-blue)](https://terminal-typing-svg.vaidikv.workers.dev/demo)
@@ -72,8 +74,6 @@ Example: `&theme=tokyonight&accent=ff0000&promptUser=00ff00`
 ```
 
 `style=heatmap` switches to a contribution-calendar card instead: compact profile stats (stars, PRs, issues) on the left, your real GitHub contribution graph for the last 16 weeks in the middle, and headline totals with your current day streak on the right. The grid fades in from its left edge and stays fully clear on the right where the most recent days are. 560 px wide to match the terminal banner. No terminal chrome, just GitHub's own green scale (adapts to light themes too). Data comes from your public contributions page plus the public API, no token needed.
-
-[![GitHub contribution heatmap](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark)](https://terminal-typing-svg.vaidikv.workers.dev/demo#stats)
 
 Try all four styles live on the [demo page](https://terminal-typing-svg.vaidikv.workers.dev/demo#stats).
 
