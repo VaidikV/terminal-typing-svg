@@ -20,7 +20,7 @@
 
 Terminal-style typing animations and GitHub stats cards for your profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor. Or add a stats card: an animated `gh stats` terminal or a contribution heatmap, generated live from the GitHub API.
 
-Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene on serverless infrastructure.
+**[Try it live](https://terminal-typing-svg.vaidikv.workers.dev/demo)**: type your own lines, pick themes and fonts, and preview the stats cards before copying the markdown.
 
 ## ⚡ Quick setup
 
@@ -103,6 +103,10 @@ npm run deploy       # needs a Cloudflare account: npx wrangler login
 ## Contributing
 
 Issues and PRs welcome. Good first areas: new themes (`src/themes.js`), new query parameters, demo page improvements. Please keep the generator dependency-free.
+
+## Acknowledgements
+
+Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene on serverless infrastructure.
 
 ## License
 
