@@ -3,6 +3,7 @@
 //   /demo (or / without params)          -> demo page
 import { generateSVG, errorSVG } from "./generator.js";
 import { generateStatsSVG } from "./stats.js";
+import { generateHeatmapSVG } from "./heatmap.js";
 import { DEMO_HTML } from "./demo.js";
 
 const UA =
@@ -111,6 +112,28 @@ async function statsResponse(url, env) {
       headers: { "content-type": "image/svg+xml;charset=UTF-8" },
     });
   }
+  const style = (url.searchParams.get("style") || "terminal").toLowerCase();
+  if (style === "heatmap") {
+    let days = null;
+    try {
+      days = await getContributions(username);
+    } catch {
+      days = null;
+    }
+    if (!days || days.length < 60) {
+      return new Response(errorSVG("could not fetch GitHub contributions, try again soon."), {
+        status: 502,
+        headers: { "content-type": "image/svg+xml;charset=UTF-8" },
+      });
+    }
+    const { svg } = generateHeatmapSVG(username, days, url.searchParams);
+    return new Response(svg, {
+      headers: {
+        "content-type": "image/svg+xml;charset=UTF-8",
+        "cache-control": `public, max-age=${STATS_TTL}`,
+      },
+    });
+  }
   let data = null;
   try {
     data = await getStats(username, env);
@@ -131,6 +154,85 @@ async function statsResponse(url, env) {
       "cache-control": `public, max-age=${STATS_TTL}`,
     },
   });
+}
+
+// Fetch the public contributions calendar page for a username and parse it
+// into per-day {date, count, level} entries. No GitHub token needed; the page
+// is public. Parsed JSON is cached 6h in the worker cache.
+async function getContributions(username) {
+  const cache = caches.default;
+  const key = new Request(
+    `https://terminal-typing-svg.contribs/${username.toLowerCase()}`
+  );
+  const hit = await cache.match(key);
+  if (hit) return hit.json();
+
+  const res = await fetch(`https://github.com/users/${username}/contributions`, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+    },
+  });
+  if (!res.ok) return null;
+  const days = parseContributions(await res.text());
+  if (!days || days.length < 60) return null;
+
+  const body = new Response(JSON.stringify(days), {
+    headers: {
+      "content-type": "application/json",
+      "cache-control": `public, max-age=${STATS_TTL}`,
+    },
+  });
+  await cache.put(key, body.clone());
+  return days;
+}
+
+const MONTH_IDX = {
+  january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+  july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+};
+
+function parseContributions(html) {
+  const tips = new Map();
+  const tipRe =
+    /<tool-tip[^>]*for="(contribution-day-component-\d+-\d+)"[^>]*>([^<]*)<\/tool-tip>/g;
+  let m;
+  while ((m = tipRe.exec(html))) tips.set(m[1], m[2].trim());
+
+  const days = [];
+  const cellRe = /id="(contribution-day-component-\d+-\d+)" data-level="(\d)"/g;
+  const now = new Date();
+  const cy = now.getUTCFullYear();
+  const cm = now.getUTCMonth();
+  const cd = now.getUTCDate();
+  while ((m = cellRe.exec(html))) {
+    const tip = tips.get(m[1]);
+    if (!tip) continue;
+    let count = 0;
+    let month = -1;
+    let day = 0;
+    let tm = /(\d+) contributions? on ([A-Za-z]+) (\d+)/.exec(tip);
+    if (tm) {
+      count = parseInt(tm[1], 10);
+      month = MONTH_IDX[tm[2].toLowerCase()];
+      day = parseInt(tm[3], 10);
+    } else {
+      tm = /No contributions on ([A-Za-z]+) (\d+)/.exec(tip);
+      if (tm) {
+        month = MONTH_IDX[tm[1].toLowerCase()];
+        day = parseInt(tm[2], 10);
+      }
+    }
+    if (month === undefined || month < 0 || !day) continue;
+    // The calendar covers the trailing ~12 months, so a month/day later in
+    // the year than today must belong to last year.
+    const year = month > cm || (month === cm && day > cd) ? cy - 1 : cy;
+    const ds =
+      `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    days.push({ date: ds, count, level: Math.min(4, parseInt(m[2], 10)) });
+  }
+  days.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  return days;
 }
 
 // Fetch public GitHub stats for a username. Raw JSON is cached 6h in the
