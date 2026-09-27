@@ -182,7 +182,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
   // Right: headline window stats.
   const headline = (value, label, y) =>
     `  <text x="${NUM_X}" y="${y}" font-family="${SANS}" font-size="26" ` +
-      `font-weight="800" fill="${num}" opacity="0.85">${fmt(value)}</text>\n` +
+      `font-weight="800" fill="${num}">${fmt(value)}</text>\n` +
     `  <text x="${NUM_X}" y="${y + 18}" font-family="${SANS}" font-size="11" ` +
       `fill="${muted}" opacity="0.85">${label}</text>`;
   parts.push(headline(total, "contributions", 96));
