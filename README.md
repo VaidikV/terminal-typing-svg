@@ -14,7 +14,7 @@
   <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo"><img src="https://img.shields.io/badge/demo-live-blue" alt="Live demo"></a>
 </p>
 
-A terminal-style typing animation for your GitHub profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor.
+Terminal-style typing animations and GitHub stats cards for your profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor. Or add a stats card: an animated `gh stats` terminal or a contribution heatmap, both generated live from the GitHub API.
 
 Also includes a `/stats` endpoint: an animated terminal-style GitHub stats card (stars, PRs, issues, followers) in the same design, plus a `style=heatmap` contribution-calendar card.
 
