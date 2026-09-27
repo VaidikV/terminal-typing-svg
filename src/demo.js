@@ -129,6 +129,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
       </div>
     </div>
     <label class="check"><input type="checkbox" id="repeat" checked> Loop the animation</label>
+    <label class="check"><input type="checkbox" id="animate" checked> Animate (off = static block, only the cursor blinks)</label>
   </div>
 
   <div class="card">
@@ -159,6 +160,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
     </div>
 
     <h3>Terminal</h3>
+    <label class="check" style="margin:0 0 12px"><input type="checkbox" id="s_animate" checked> Animate (off = static block, only the cursor blinks)</label>
     <img id="s_preview_terminal" alt="Terminal stats preview" style="max-width:100%;height:auto;display:block;background:#0d1117;border-radius:8px">
     <label style="margin-top:16px">Image URL</label>
     <div class="out"><pre id="s_url_terminal"></pre><button class="copy" data-for="s_url_terminal">Copy</button></div>
@@ -185,6 +187,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
   var els = {};
   fields.forEach(function (id) { els[id] = document.getElementById(id); });
   els.repeat = document.getElementById("repeat");
+  els.animate = document.getElementById("animate");
 
   function linesParam() {
     return els.lines.value.split("\\n").map(function (l) { return l.trim(); })
@@ -202,6 +205,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
     if (els.typingSpeed.value && els.typingSpeed.value !== "60") p.set("typingSpeed", els.typingSpeed.value);
     if (els.hold.value && els.hold.value !== "2000") p.set("hold", els.hold.value);
     if (!els.repeat.checked) p.set("repeat", "false");
+    if (!els.animate.checked) p.set("animate", "false");
     return location.origin + "/?" + p.toString();
   }
   function refresh() {
@@ -229,11 +233,16 @@ export const DEMO_HTML = `<!DOCTYPE html>
 (function () {
   var username = document.getElementById("s_username");
   var theme = document.getElementById("s_theme");
+  var animateBox = document.getElementById("s_animate");
   var names = { terminal: "GitHub stats", heatmap: "GitHub contribution heatmap" };
   function buildURL(style) {
     var p = new URLSearchParams();
-    p.set("username", username.value.trim() || "User");
-    if (style !== "terminal") p.set("style", style);
+    var uname = username.value.trim() || "User";
+    p.set("username", uname);
+    // The default "User" account has an empty contribution graph, so show
+    // labeled sample data for the heatmap preview instead of a blank grid.
+    if (style === "heatmap" && uname === "User") p.set("demo", "1");
+    if (style === "terminal" && !animateBox.checked) p.set("animate", "false");
     if (theme.value !== "github-dark") p.set("theme", theme.value);
     return location.origin + "/stats?" + p.toString();
   }
@@ -246,7 +255,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
         "[![" + names[style] + "](" + u + ")](https://github.com/VaidikV/terminal-typing-svg)";
     });
   }
-  [username, theme].forEach(function (el) {
+  [username, theme, animateBox].forEach(function (el) {
     el.addEventListener("input", refreshStats);
     el.addEventListener("change", refreshStats);
   });
