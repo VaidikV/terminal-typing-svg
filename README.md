@@ -5,6 +5,10 @@
 </p>
 
 <p align="center">
+  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV" alt="GitHub stats"></a>
+</p>
+
+<p align="center">
   <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark" alt="GitHub contribution heatmap"></a>
 </p>
 
