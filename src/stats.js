@@ -45,9 +45,6 @@ const FADE = 400;
 const RESTART_GAP = 500;
 const LABEL_X = PAD_X;
 const VALUE_X = PAD_X + 190;
-const LANG_COUNT_X = PAD_X + 120;
-const BAR_X = PAD_X + 190;
-const BAR_H = 10;
 
 export function langColor(name, fallback) {
   return LANG_COLORS[name] || fallback;
@@ -96,6 +93,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   const width = Math.max(
     p.minWidth,
     480,
+    Math.ceil(barX + MAX_BAR_W + PAD_X),
     Math.ceil(
       Math.max(
         promptText.length + cmd.length + 1,
@@ -104,6 +102,13 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     )
   );
   const height = CHROME_H + lines * LINE_H + 26;
+
+  // Language section columns sized from the longest language name so the
+  // count and bars never overlap the labels.
+  const BAR_H = 10;
+  const maxNameW = Math.max(0, ...langs.map((l) => l.name.length)) * p.adv;
+  const langCountX = Math.ceil(PAD_X + maxNameW + 20);
+  const barX = Math.ceil(langCountX + 56);
 
   // ---- timeline ----
   const nTypeChars = promptText.length + cmd.length + 1;
@@ -211,9 +216,9 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
           `      <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
           `        values="${f2.values}" keyTimes="${f2.keyTimes}"/>\n` +
           `      <text x="${LABEL_X}" y="${y}" font-family="${stack}" font-size="${p.fontSize}" fill="${p.t.output}">${esc(l.name)}</text>\n` +
-          `      <text x="${LANG_COUNT_X}" y="${y}" font-family="${stack}" font-size="${p.fontSize}" font-weight="600" fill="${p.t.accent}">${l.count}</text>\n` +
-          `      <rect x="${BAR_X}" y="${y - BAR_H + 2}" width="${MAX_BAR_W}" height="${BAR_H}" rx="5" fill="${p.t.divider}" opacity="0.45"/>\n` +
-          `      <rect x="${BAR_X}" y="${y - BAR_H + 2}" width="0" height="${BAR_H}" rx="5" fill="${l.color}">\n` +
+          `      <text x="${langCountX}" y="${y}" font-family="${stack}" font-size="${p.fontSize}" font-weight="600" fill="${p.t.accent}">${l.count}</text>\n` +
+          `      <rect x="${barX}" y="${y - BAR_H + 2}" width="${MAX_BAR_W}" height="${BAR_H}" rx="5" fill="${p.t.divider}" opacity="0.45"/>\n` +
+          `      <rect x="${barX}" y="${y - BAR_H + 2}" width="0" height="${BAR_H}" rx="5" fill="${l.color}">\n` +
           `        <animate attributeName="width" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
           `          values="0;0;${w};${w};${repeat ? 0 : w}" keyTimes="0;${a};${b};${kOut.toFixed(4)};1"/>\n` +
           `      </rect>\n` +
