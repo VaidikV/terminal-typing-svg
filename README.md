@@ -8,7 +8,7 @@
 
 A terminal-style typing animation for your GitHub profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor.
 
-Also includes a `/stats` endpoint: an animated terminal-style GitHub stats card (stars, PRs, issues, followers, top-language bars) in the same design.
+Also includes a `/stats` endpoint: an animated terminal-style GitHub stats card (stars, PRs, issues, followers) in the same design, plus a `style=heatmap` contribution-calendar card.
 
 Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene on serverless infrastructure: no PHP server to babysit.
 
@@ -63,18 +63,26 @@ Any theme color can be overridden per request (hex, with or without `#`):
 
 Example: `&theme=tokyonight&accent=ff0000&promptUser=00ff00`
 
-## GitHub stats terminal
+## GitHub stats cards
 
-`/stats` renders a terminal running `gh stats`, animated in the same style: the command types out, stats fade in one by one, then top-language bars grow. It shares the themes, color overrides, fonts, and prompt/title parameters above.
+`/stats` renders a terminal running `gh stats`, animated in the same style: the command types out, stats fade in one by one, and only the final cursor keeps blinking. It shares the themes, color overrides, fonts, and prompt/title parameters above. Add `animate=false` for a fully static card where everything renders immediately.
 
 ```md
 [![GitHub stats](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&theme=github-dark)](https://github.com/VaidikV/terminal-typing-svg)
+```
+
+`style=heatmap` switches to a contribution-calendar card instead: your real GitHub contribution graph for the last 16 weeks, with totals and your current day streak. No terminal chrome, just the grid in GitHub's own green scale (adapts to light themes too). Data comes from your public contributions page, no token needed.
+
+```md
+[![GitHub contributions](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark)](https://github.com/VaidikV/terminal-typing-svg)
 ```
 
 | Parameter  | Default        | Description                          |
 | ---------- | -------------- | ------------------------------------ |
 | `username` | (required)     | GitHub username                      |
 | `theme`    | `github-dark`  | one of the 5 themes, plus overrides  |
+| `style`    | `terminal`     | `terminal` or `heatmap`              |
+| `animate`  | `true`         | `false` renders the terminal card statically |
 | `prompt`   | `user@github`  | prompt user                          |
 | `title`    | `zsh`          | window title                         |
 | `font`     | JetBrains Mono | any Google Font                      |
