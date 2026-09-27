@@ -73,6 +73,10 @@ Example: `&theme=tokyonight&accent=ff0000&promptUser=00ff00`
 
 `style=heatmap` switches to a contribution-calendar card instead: your real GitHub contribution graph for the last 16 weeks, with totals and your current day streak. No terminal chrome, just the grid in GitHub's own green scale (adapts to light themes too). Data comes from your public contributions page, no token needed.
 
+`style=dashboard` is a minimal Linear-style card: oversized numbers, hairline dividers, tiny uppercase labels.
+
+`style=blueprint` is an engineering-drawing card: blueprint blue, thin white linework, dotted spec leaders, registration marks, and a title block.
+
 ```md
 [![GitHub contributions](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark)](https://github.com/VaidikV/terminal-typing-svg)
 ```
@@ -81,7 +85,7 @@ Example: `&theme=tokyonight&accent=ff0000&promptUser=00ff00`
 | ---------- | -------------- | ------------------------------------ |
 | `username` | (required)     | GitHub username                      |
 | `theme`    | `github-dark`  | one of the 5 themes, plus overrides  |
-| `style`    | `terminal`     | `terminal` or `heatmap`              |
+| `style`    | `terminal`     | `terminal`, `heatmap`, `dashboard`, `blueprint` |
 | `animate`  | `true`         | `false` renders the terminal card statically |
 | `prompt`   | `user@github`  | prompt user                          |
 | `title`    | `zsh`          | window title                         |
