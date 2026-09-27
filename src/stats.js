@@ -81,22 +81,9 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   const valueX = Math.ceil(labelX + maxLabelW + 18);
   const cmdLen = (promptText.length + cmd.length) * adv + PAD_X * 2 + 24;
   // Compact card: narrow floor unless the user asked for a width.
+  // Content stays left-aligned like a real terminal window.
   const minW = q.has("width") ? p.minWidth : 380;
   const width = Math.max(minW, Math.ceil(cmdLen));
-
-  // When the caller requests a wider card, center the content column
-  // instead of leaving it left-aligned in empty space.
-  let shiftX = 0;
-  if (q.has("width")) {
-    const maxValueW = Math.max(...stats.map((s) => s.value.length)) * adv;
-    const contentRight = Math.max(
-      valueX + maxValueW,
-      PAD_X + (promptText.length + cmd.length) * adv
-    );
-    // left margin (PAD_X + shiftX) == right margin (width - contentRight - shiftX)
-    shiftX = Math.max(0, Math.floor((width - contentRight - PAD_X) / 2));
-  }
-  const X = (x) => x + shiftX;
 
   // ---- timeline (animated mode) ----
   const nTypeChars = promptText.length + cmd.length + 1;
@@ -158,8 +145,8 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   // Command line: typed via textPath when animated, plain text when static.
   if (animated) {
     const fullLen = nTypeChars * adv + 14;
-    const d0 = `M ${X(PAD_X)},${yCmd} h0`;
-    const d1 = `M ${X(PAD_X)},${yCmd} h${fullLen.toFixed(1)}`;
+    const d0 = `M ${PAD_X},${yCmd} h0`;
+    const d1 = `M ${PAD_X},${yCmd} h${fullLen.toFixed(1)}`;
     const begin = repeat ? `0s;outro.end+${RESTART_GAP}ms` : "0s";
     const tspans =
       promptTspans("") +
@@ -175,7 +162,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     );
   } else {
     parts.push(
-      `    <text x="${X(PAD_X)}" y="${yCmd}" font-family="${stack}" font-size="${fs}">` +
+      `    <text x="${PAD_X}" y="${yCmd}" font-family="${stack}" font-size="${fs}">` +
         promptTspans("") +
         `<tspan fill="${p.t.command}" font-weight="600">${esc(cmd)}</tspan></text>`
     );
@@ -184,10 +171,10 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   // Stat rows with icons.
   stats.forEach((s, i) => {
     parts.push(show(
-      `      ${iconSvg(s.icon, X(PAD_X), yStat(i) - 12)}\n` +
-        `      <text x="${X(labelX)}" y="${yStat(i)}" font-family="${stack}" font-size="${fs}">` +
+      `      ${iconSvg(s.icon, PAD_X, yStat(i) - 12)}\n` +
+        `      <text x="${labelX}" y="${yStat(i)}" font-family="${stack}" font-size="${fs}">` +
         `<tspan fill="${p.t.output}">${esc(s.label)}</tspan></text>\n` +
-        `      <text x="${X(valueX)}" y="${yStat(i)}" font-family="${stack}" font-size="${fs}" font-weight="600" fill="${p.t.accent}">${esc(s.value)}</text>`,
+        `      <text x="${valueX}" y="${yStat(i)}" font-family="${stack}" font-size="${fs}" font-weight="600" fill="${p.t.accent}">${esc(s.value)}</text>`,
       tStat(i)
     ));
   });
@@ -202,7 +189,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     `dur="1.06s" repeatCount="indefinite" begin="${cursorBegin}"${cursorEnd}/>` +
     `</tspan>`;
   parts.push(show(
-    `      <text x="${X(PAD_X)}" y="${yPrompt2}" font-family="${stack}" font-size="${fs}">${promptTspans(cursor)}</text>`,
+    `      <text x="${PAD_X}" y="${yPrompt2}" font-family="${stack}" font-size="${fs}">${promptTspans(cursor)}</text>`,
     tPrompt2, 200
   ));
 
