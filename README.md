@@ -55,7 +55,7 @@ All options are query parameters.
 
 Any theme color can be overridden per request (hex, with or without `#`):
 
-`bg1`, `bg2`, `border`, `promptUser`, `promptPath`, `promptDollar`, `command`, `output`, `accent` (cursor), `titleColor`.
+`bg1`, `bg2`, `border`, `promptUser`, `promptPath`, `promptDollar`, `command`, `output`, `accent` (cursor), `titleColor`, `dots` (heatmap dot hue).
 
 Example: `&theme=tokyonight&accent=ff0000&promptUser=00ff00`
 
