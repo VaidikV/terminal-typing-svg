@@ -45,6 +45,8 @@ export const DEMO_HTML = `<!DOCTYPE html>
   footer a { color: #58a6ff; text-decoration: none; }
   footer a:hover { text-decoration: underline; }
   .hint { font-size: 12px; color: #8b949e; margin-top: 6px; line-height: 1.5; }
+  p.new { color: #8b949e; margin: 0 0 28px; line-height: 1.6; font-size: 14px; }
+  p.new code { background: #161b22; padding: 2px 6px; border-radius: 6px; font-size: 13px; }
   .topbar { display: flex; align-items: flex-start; justify-content: space-between;
     gap: 16px; }
   .ghbtn { display: inline-flex; align-items: center; gap: 8px; background: #21262d;
@@ -67,6 +69,8 @@ export const DEMO_HTML = `<!DOCTYPE html>
   Prefix a line with <code>$&nbsp;</code> to type it as a command, following lines become its output.
   Separate lines with <code>;</code>. Inspired by
   <a href="https://github.com/DenverCoder1/readme-typing-svg" style="color:#58a6ff">readme-typing-svg</a>.</p>
+  <p class="new">✨ New: <a href="/stats?username=VaidikV" style="color:#58a6ff">terminal-style GitHub stats</a>
+  — try <code>/stats?username=yourname</code></p>
 
   <div class="card">
     <h2>Live preview</h2>
