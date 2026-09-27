@@ -1,12 +1,18 @@
 # ⌨️ Terminal Typing SVG
 
-[![Typing demo](https://terminal-typing-svg.vaidikv.workers.dev/?lines=%24%20whoami;terminal-typing-svg;%24%20cat%20mission.txt;beautiful%20typing%20animations%20for%20your%20README;no%20server.%20no%20php.%20just%20a%20url.&theme=tokyonight)](https://terminal-typing-svg.vaidikv.workers.dev/demo)
+<p align="center">
+  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo"><img src="https://terminal-typing-svg.vaidikv.workers.dev/?lines=%24%20whoami;terminal-typing-svg;%24%20cat%20mission.txt;beautiful%20typing%20animations%20for%20your%20README;no%20server.%20no%20php.%20just%20a%20url.&theme=tokyonight" alt="Typing demo"></a>
+</p>
 
-[![GitHub contribution heatmap](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark)](https://terminal-typing-svg.vaidikv.workers.dev/demo#stats)
+<p align="center">
+  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark" alt="GitHub contribution heatmap"></a>
+</p>
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/VaidikV/terminal-typing-svg/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/VaidikV/terminal-typing-svg?style=flat)](https://github.com/VaidikV/terminal-typing-svg/stargazers)
-[![Live demo](https://img.shields.io/badge/demo-live-blue)](https://terminal-typing-svg.vaidikv.workers.dev/demo)
+<p align="center">
+  <a href="https://github.com/VaidikV/terminal-typing-svg/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License"></a>
+  <a href="https://github.com/VaidikV/terminal-typing-svg/stargazers"><img src="https://img.shields.io/github/stars/VaidikV/terminal-typing-svg?style=flat" alt="GitHub stars"></a>
+  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo"><img src="https://img.shields.io/badge/demo-live-blue" alt="Live demo"></a>
+</p>
 
 A terminal-style typing animation for your GitHub profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor.
 
