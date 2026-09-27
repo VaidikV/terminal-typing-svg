@@ -138,7 +138,6 @@ async function statsResponse(url, env) {
     }
     const { svg } = generateHeatmapSVG(username, days, url.searchParams, {
       stars: stats ? stats.stars : null,
-      commits: stats ? stats.commits : null,
       prs: stats ? stats.prs : null,
       issues: stats ? stats.issues : null,
     });
@@ -276,12 +275,11 @@ async function getStats(username, env) {
     fetch(`https://api.github.com${path}`, { headers }).then((r) =>
       r.ok ? r.json() : null
     );
-  const [user, repos, prs, issues, commits] = await Promise.all([
+  const [user, repos, prs, issues] = await Promise.all([
     gh("user", `/users/${username}`),
     gh("repos", `/users/${username}/repos?per_page=100&type=owner&sort=pushed`),
     gh("prs", `/search/issues?q=author:${username}+type:pr&per_page=1`),
     gh("issues", `/search/issues?q=author:${username}+type:issue&per_page=1`),
-    gh("commits", `/search/commits?q=author:${username}&per_page=1`),
   ]);
   if (!user || !Array.isArray(repos)) return null;
 
@@ -294,7 +292,6 @@ async function getStats(username, env) {
     repos: user.public_repos,
     prs: prs ? prs.total_count : 0,
     issues: issues ? issues.total_count : 0,
-    commits: commits ? commits.total_count : null,
     followers: user.followers,
   };
   const res = new Response(JSON.stringify(data), {
