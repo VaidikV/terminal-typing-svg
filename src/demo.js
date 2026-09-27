@@ -70,7 +70,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
   Separate lines with <code>;</code>. Inspired by
   <a href="https://github.com/DenverCoder1/readme-typing-svg" style="color:#58a6ff">readme-typing-svg</a>.</p>
   <p class="new">✨ New: <a href="#stats" style="color:#58a6ff">GitHub stats cards</a>,
-  terminal, heatmap, dashboard, blueprint. Try one below.</p>
+  terminal and heatmap styles. Try one below.</p>
 
   <div class="card">
     <h2>Live preview</h2>
@@ -143,15 +143,13 @@ export const DEMO_HTML = `<!DOCTYPE html>
     <div class="row">
       <div>
         <label for="s_username">GitHub username</label>
-        <input type="text" id="s_username" value="VaidikV" spellcheck="false">
+        <input type="text" id="s_username" value="User" spellcheck="false">
       </div>
       <div>
         <label for="s_style">Style</label>
         <select id="s_style">
           <option value="heatmap" selected>Heatmap (contribution graph)</option>
           <option value="terminal">Terminal (animated gh stats)</option>
-          <option value="dashboard">Dashboard (minimal numbers)</option>
-          <option value="blueprint">Blueprint (engineering drawing)</option>
         </select>
       </div>
     </div>
@@ -168,7 +166,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
       </div>
     </div>
     <label style="margin-top:16px">Live preview</label>
-    <img id="s_preview" alt="Stats card preview" style="width:100%;height:auto;display:block;background:#0d1117;border-radius:8px">
+    <img id="s_preview" alt="Stats card preview" style="max-width:100%;height:auto;display:block;background:#0d1117;border-radius:8px">
     <label style="margin-top:16px">Image URL</label>
     <div class="out"><pre id="s_url"></pre><button class="copy" data-for="s_url">Copy</button></div>
     <label style="margin-top:16px">Markdown for your README</label>
@@ -234,15 +232,14 @@ export const DEMO_HTML = `<!DOCTYPE html>
   var theme = document.getElementById("s_theme");
   function buildURL() {
     var p = new URLSearchParams();
-    p.set("username", username.value.trim() || "VaidikV");
+    p.set("username", username.value.trim() || "User");
     if (style.value !== "terminal") p.set("style", style.value);
     if (theme.value !== "github-dark") p.set("theme", theme.value);
     return location.origin + "/stats?" + p.toString();
   }
   function refreshStats() {
     var u = buildURL();
-    var names = { heatmap: "GitHub contribution heatmap", terminal: "GitHub stats",
-      dashboard: "GitHub dashboard", blueprint: "GitHub blueprint" };
+    var names = { heatmap: "GitHub contribution heatmap", terminal: "GitHub stats" };
     document.getElementById("s_preview").src = u;
     document.getElementById("s_url").textContent = u;
     document.getElementById("s_md").textContent =
