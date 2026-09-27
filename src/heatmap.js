@@ -45,8 +45,12 @@ const fmt = (v) => (v == null ? "-" : Number(v).toLocaleString("en-US"));
 
 export function generateHeatmapSVG(username, days, rawQuery, profile) {
   const p = buildParams(rawQuery);
+  const q = rawQuery instanceof URLSearchParams ? rawQuery : new URLSearchParams(rawQuery);
+  const sample = q.get("demo") === "1";
   const scale = luminance(p.t.bg1) < 0.5 ? DARK_SCALE : LIGHT_SCALE;
   const byDate = new Map(days.map((d) => [d.date, d]));
+  // Bright foreground for the numbers; muted stays for the labels.
+  const num = p.t.command;
 
   // Group into Sunday-start weeks, keep the most recent 16.
   const weekStart = (ds) => {
@@ -119,7 +123,8 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
   parts.push(
     `  <text x="${PAD}" y="${PAD + 13}" font-family="${SANS}" font-size="13">` +
       `<tspan font-weight="700" fill="${p.t.title}">${esc(username)}</tspan>` +
-      `<tspan fill="${muted}" opacity="0.6"> \u00b7 last ${WEEKS} weeks</tspan></text>`
+      `<tspan fill="${muted}" opacity="0.6"> \u00b7 last ${WEEKS} weeks` +
+      `${sample ? " \u00b7 sample data" : ""}</tspan></text>`
   );
 
   // Left: compact profile stats, less verbose than the profile card.
@@ -132,7 +137,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
     const y = 82 + i * 38;
     parts.push(
       `  <text x="${ROWS_X}" y="${y}" font-family="${SANS}" font-size="15">` +
-        `<tspan font-weight="700" fill="${p.t.title}">${fmt(value)}</tspan>` +
+        `<tspan font-weight="700" fill="${num}">${fmt(value)}</tspan>` +
         `<tspan font-size="11" fill="${muted}" opacity="0.6"> ${label}</tspan></text>`
     );
   });
@@ -177,7 +182,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
   // Right: headline window stats.
   const headline = (value, label, y) =>
     `  <text x="${NUM_X}" y="${y}" font-family="${SANS}" font-size="26" ` +
-      `font-weight="800" fill="${p.t.title}">${fmt(value)}</text>\n` +
+      `font-weight="800" fill="${num}">${fmt(value)}</text>\n` +
     `  <text x="${NUM_X}" y="${y + 18}" font-family="${SANS}" font-size="11" ` +
       `fill="${muted}" opacity="0.6">${label}</text>`;
   parts.push(headline(total, "contributions", 96));
