@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark&v=2" alt="GitHub contribution heatmap"></a>
+  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark&v=3" alt="GitHub contribution heatmap"></a>
 </p>
 
 <p align="center">
