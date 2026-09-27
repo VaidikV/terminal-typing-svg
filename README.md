@@ -71,7 +71,7 @@ Example: `&theme=tokyonight&accent=ff0000&promptUser=00ff00`
 [![GitHub stats](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&theme=github-dark)](https://github.com/VaidikV/terminal-typing-svg)
 ```
 
-`style=heatmap` switches to a contribution-calendar card instead: compact profile stats (stars, commits, PRs, issues) on the left, your real GitHub contribution graph for the last 16 weeks in the middle, and headline totals with your current day streak on the right. The grid fades in from its left edge and stays fully clear on the right where the most recent days are. 560 px wide to match the terminal banner. No terminal chrome, just GitHub's own green scale (adapts to light themes too). Data comes from your public contributions page plus the public API, no token needed.
+`style=heatmap` switches to a contribution-calendar card instead: compact profile stats (stars, PRs, issues) on the left, your real GitHub contribution graph for the last 16 weeks in the middle, and headline totals with your current day streak on the right. The grid fades in from its left edge and stays fully clear on the right where the most recent days are. 560 px wide to match the terminal banner. No terminal chrome, just GitHub's own green scale (adapts to light themes too). Data comes from your public contributions page plus the public API, no token needed.
 
 `style=dashboard` is a minimal Linear-style card: oversized numbers, hairline dividers, tiny uppercase labels.
 
