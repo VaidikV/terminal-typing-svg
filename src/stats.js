@@ -193,7 +193,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
       `      <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
       `        values="${hw.values}" keyTimes="${hw.keyTimes}"/>\n` +
       `      <text x="${PAD_X}" y="${yHead}" font-family="${stack}" font-size="${p.fontSize}" font-weight="600" fill="${p.t.promptUser}">${esc(p.prompt)}</text>\n` +
-      `      <text x="${PAD_X}" y="${yDashes}" font-family="${stack}" font-size="${p.fontSize}" fill="${p.t.divider}">${dashes}</text>\n` +
+      `      <text x="${PAD_X}" y="${yDashes}" font-family="${stack}" font-size="${p.fontSize}" fill="${p.t.output}" opacity="0.55">${dashes}</text>\n` +
       `    </g>`
   );
 
