@@ -78,7 +78,9 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   const maxLabelW = Math.max(...stats.map((s) => s.label.length)) * adv;
   const valueX = Math.ceil(labelX + maxLabelW + 18);
   const cmdLen = (promptText.length + cmd.length) * adv + PAD_X * 2 + 24;
-  const width = Math.max(380, p.minWidth, Math.ceil(cmdLen));
+  // Compact card: narrow floor unless the user asked for a width.
+  const minW = q.has("width") ? p.minWidth : 380;
+  const width = Math.max(minW, Math.ceil(cmdLen));
 
   // ---- timeline (animated mode) ----
   const nTypeChars = promptText.length + cmd.length + 1;
