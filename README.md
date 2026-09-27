@@ -4,17 +4,17 @@ A dynamically generated, terminal-style typing animation for your GitHub profile
 
 Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene with a hosted generator anyone can use.
 
-**[Try the live demo](https://terminal-typing-svg.vaid-ik-vvv.workers.dev/demo)**
+**[Try the live demo](https://terminal-typing-svg.vaidikv.workers.dev/demo)**
 
 ## Quick start
 
 Paste this into your profile README (replace the `lines` with your own):
 
 ```md
-[![Typing SVG](https://terminal-typing-svg.vaid-ik-vvv.workers.dev/?lines=$%20whoami;Backend%20engineer;$%20cat%20focus.txt;AI%20+%20LLM%20integration)](https://github.com/VaidikV/terminal-typing-svg)
+[![Typing SVG](https://terminal-typing-svg.vaidikv.workers.dev/?lines=$%20whoami;Backend%20engineer;$%20cat%20focus.txt;AI%20+%20LLM%20integration)](https://github.com/VaidikV/terminal-typing-svg)
 ```
 
-The easiest way to build your URL is the [demo page](https://terminal-typing-svg.vaid-ik-vvv.workers.dev/demo): type, tweak, preview live, copy the markdown.
+The easiest way to build your URL is the [demo page](https://terminal-typing-svg.vaidikv.workers.dev/demo): type, tweak, preview live, copy the markdown.
 
 ## How `lines` works
 
