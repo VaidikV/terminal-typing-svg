@@ -10,8 +10,6 @@
 import { buildParams, esc } from "./generator.js";
 
 const SANS = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif`;
-const DARK_SCALE = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"];
-const LIGHT_SCALE = ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"];
 const WEEKS = 16;
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -43,11 +41,25 @@ function luminance(hex) {
 const iso = (d) => d.toISOString().slice(0, 10);
 const fmt = (v) => (v == null ? "-" : Number(v).toLocaleString("en-US"));
 
+// Linear blend between two hex colors. t=0 -> a, t=1 -> b.
+function mix(a, b, t) {
+  const x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
+  const r = Math.round(((x >> 16) & 255) * (1 - t) + ((y >> 16) & 255) * t);
+  const g = Math.round(((x >> 8) & 255) * (1 - t) + ((y >> 8) & 255) * t);
+  const bl = Math.round((x & 255) * (1 - t) + (y & 255) * t);
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1);
+}
+
 export function generateHeatmapSVG(username, days, rawQuery, profile) {
   const p = buildParams(rawQuery);
   const q = rawQuery instanceof URLSearchParams ? rawQuery : new URLSearchParams(rawQuery);
   const sample = q.get("demo") === "1";
-  const scale = luminance(p.t.bg1) < 0.5 ? DARK_SCALE : LIGHT_SCALE;
+  // Dot colors follow the theme: the 5-step scale is blended from the theme's
+  // dot hue toward the empty-cell color (overridable with &dots=).
+  const dark = luminance(p.t.bg1) < 0.5;
+  const empty = dark ? p.t.bg1 : "#ebedf0";
+  const base = p.t.dots || "#39d353";
+  const scale = [empty, mix(empty, base, 0.35), mix(empty, base, 0.55), mix(empty, base, 0.8), base];
   const byDate = new Map(days.map((d) => [d.date, d]));
   // Bright foreground for the numbers; muted stays for the labels.
   const num = p.t.command;
