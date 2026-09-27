@@ -18,36 +18,19 @@
   <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo"><img src="https://img.shields.io/badge/demo-live-blue" alt="Live demo"></a>
 </p>
 
-Terminal-style typing animations and GitHub stats cards for your profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor. Or add a stats card: an animated `gh stats` terminal or a contribution heatmap, both generated live from the GitHub API.
+Terminal-style typing animations and GitHub stats cards for your profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor. Or add a stats card: an animated `gh stats` terminal or a contribution heatmap, generated live from the GitHub API.
 
-Also includes a `/stats` endpoint: an animated terminal-style GitHub stats card (stars, PRs, issues, followers) in the same design, plus a `style=heatmap` contribution-calendar card.
-
-Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene on serverless infrastructure: no PHP server to babysit.
+Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene on serverless infrastructure.
 
 ## ⚡ Quick setup
 
 1. Copy-paste the markdown below into your GitHub profile README.
-2. Replace the value after `?lines=` with your text. Separate lines with semicolons and use `%20` for spaces. A line starting with `$ ` is typed as a command, any other line is printed as its output.
-3. Tweak it visually on the [demo page](https://terminal-typing-svg.vaidikv.workers.dev/demo): live preview, themes, fonts, then copy the markdown.
+2. Replace the value after `?lines=` with your text. Separate lines with `;` (use `%20` for spaces). A line starting with `$ ` is typed as a command; any other line fades in as its output.
+3. Tweak it on the [demo page](https://terminal-typing-svg.vaidikv.workers.dev/demo): live preview, themes, fonts, then copy the markdown.
 
 ```md
 [![Typing SVG](https://terminal-typing-svg.vaidikv.workers.dev/?lines=$%20whoami;Backend%20engineer;$%20cat%20focus.txt;AI%20+%20LLM%20integration)](https://github.com/VaidikV/terminal-typing-svg)
 ```
-
-## How `lines` works
-
-Separate lines with `;`.
-
-- A line starting with `$ ` is **typed** as a command (with a colored `user@github:~$` prompt) and starts a new scene.
-- Any other line is **printed** as that command's output, fading in below it.
-
-Example:
-
-```
-lines=$ whoami;Backend engineer, MSCS @ USC;$ cat focus.txt;AI + LLM integration;developer tooling;$ ls ~/builds;conduit/  baton/  omnichat/
-```
-
-renders three scenes: `whoami` types, then its output appears; the scene holds, deletes, and the next command types.
 
 ## Options
 
@@ -55,18 +38,18 @@ All options are query parameters.
 
 | Parameter | Default | Description |
 |---|---|---|
-| `lines` | (required) | `;`-separated lines. `$ ` prefix = typed command, else output line |
+| `lines` | (required) | `;`-separated lines; `$ ` prefix = typed command, else output |
 | `theme` | `github-dark` | `github-dark`, `tokyonight`, `dracula`, `monokai`, `github-light` |
-| `prompt` | `user@github` | Username shown in the shell prompt |
-| `title` | `zsh` | Terminal window title |
-| `font` | `JetBrains Mono` | Any Google Font (fetched at request time, embedded in the SVG) |
-| `fontSize` | `15` | Font size in px |
-| `width` | `560` | Minimum width in px (grows automatically for long lines) |
-| `typingSpeed` | `60` | Milliseconds per typed character |
-| `deleteSpeed` | `18` | Milliseconds per deleted character |
-| `hold` | `2000` | Milliseconds the finished scene stays on screen |
-| `repeat` | `true` | Loop the animation (`false` freezes on the last scene) |
-| `animate` | `true` | `false` renders the last scene as a static block (only the cursor blinks) |
+| `prompt` | `user@github` | prompt username |
+| `title` | `zsh` | window title |
+| `font` | `JetBrains Mono` | any Google Font (embedded per request) |
+| `fontSize` | `15` | px |
+| `width` | `560` | min width in px |
+| `typingSpeed` | `60` | ms per typed character |
+| `deleteSpeed` | `18` | ms per deleted character |
+| `hold` | `2000` | ms the finished scene stays on screen |
+| `repeat` | `true` | loop (`false` freezes on the last scene) |
+| `animate` | `true` | `false` = static block, only the cursor blinks |
 
 ### Color overrides
 
@@ -78,46 +61,35 @@ Example: `&theme=tokyonight&accent=ff0000&promptUser=00ff00`
 
 ## GitHub stats cards
 
-`/stats` renders a terminal running `gh stats`, animated in the same style: the command types out, stats fade in one by one, and only the final cursor keeps blinking. It shares the themes, color overrides, fonts, and prompt/title parameters above. Add `animate=false` for a fully static card where everything renders immediately.
+`/stats` renders a terminal running `gh stats`: the command types out, stats fade in one by one, only the final cursor keeps blinking. `style=heatmap` switches to a contribution-calendar card instead: profile stats on the left, your real 16-week contribution graph in the middle, totals and current day streak on the right.
 
 ```md
 [![GitHub stats](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&theme=github-dark)](https://github.com/VaidikV/terminal-typing-svg)
 ```
 
-`style=heatmap` switches to a contribution-calendar card instead: compact profile stats (stars, PRs, issues) on the left, your real GitHub contribution graph for the last 16 weeks in the middle, and headline totals with your current day streak on the right. The grid fades in from its left edge and stays fully clear on the right where the most recent days are. 560 px wide to match the terminal banner. No terminal chrome, just GitHub's own green scale (adapts to light themes too). Data comes from your public contributions page plus the public API, no token needed.
-
-Try all four styles live on the [demo page](https://terminal-typing-svg.vaidikv.workers.dev/demo#stats).
-
-`style=dashboard` is a minimal Linear-style card: oversized numbers, hairline dividers, tiny uppercase labels.
-
-`style=blueprint` is an engineering-drawing card: blueprint blue, thin white linework, dotted spec leaders, registration marks, and a title block.
-
-```md
-[![GitHub contributions](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&style=heatmap&theme=github-dark)](https://github.com/VaidikV/terminal-typing-svg)
-```
+Also `style=dashboard` (minimal Linear-style card) and `style=blueprint` (engineering-drawing card). Try them on the [demo page](https://terminal-typing-svg.vaidikv.workers.dev/demo#stats).
 
 | Parameter  | Default        | Description                          |
 | ---------- | -------------- | ------------------------------------ |
 | `username` | (required)     | GitHub username                      |
 | `theme`    | `github-dark`  | one of the 5 themes, plus overrides  |
 | `style`    | `terminal`     | `terminal`, `heatmap`, `dashboard`, `blueprint` |
-| `animate`  | `true`         | `false` renders the terminal card statically |
-| `prompt`   | `user@github`  | prompt user                          |
+| `animate`  | `true`         | `false` = static terminal card       |
+| `prompt`   | `user@github`  | prompt username                      |
 | `title`    | `zsh`          | window title                         |
 | `font`     | JetBrains Mono | any Google Font                      |
-| `fontSize` | `15`           | font size in px                      |
+| `fontSize` | `15`           | px                                   |
 | `repeat`   | `true`         | loop the animation                   |
 | `hold`     | `3500`         | ms to hold the finished card         |
-| `demo`     | (off)          | `demo=1` renders labeled sample data (for previews) |
+| `demo`     | (off)          | `demo=1` = labeled sample data (for previews) |
 
 Stats are fetched live from the GitHub API and cached for 6 hours. Self-hosters can set a `GITHUB_TOKEN` secret on the worker to raise GitHub's API rate limits.
 
 ## How it works
 
-- Pure SVG + SMIL animation. No JavaScript runs in the README, so it animates everywhere GitHub renders images.
-- Each command types via an animated `<textPath>`, outputs fade in with staggered timing, then the line deletes and the next scene begins.
-- JetBrains Mono is subsetted and base64-embedded at build time, so the default font renders identically everywhere with zero request-time dependencies.
-- Served from a Cloudflare Worker (free tier): `src/generator.js` is the pure generator, `src/worker.js` is the HTTP layer, `src/demo.js` is the demo page.
+- Pure SVG + SMIL: no JavaScript, so it animates everywhere GitHub renders images.
+- JetBrains Mono is subsetted and embedded at build time; custom Google Fonts are fetched and embedded per request.
+- Cloudflare Worker: `src/generator.js` is the pure generator, `src/worker.js` the HTTP layer, `src/demo.js` the demo page.
 
 ## Self-hosting
 
