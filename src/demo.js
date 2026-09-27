@@ -239,6 +239,7 @@ export const DEMO_HTML = `<!DOCTYPE html>
     var p = new URLSearchParams();
     var uname = username.value.trim() || "User";
     p.set("username", uname);
+    if (style !== "terminal") p.set("style", style);
     // The default "User" account has an empty contribution graph, so show
     // labeled sample data for the heatmap preview instead of a blank grid.
     if (style === "heatmap" && uname === "User") p.set("demo", "1");
