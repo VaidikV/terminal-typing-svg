@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV" alt="GitHub stats"></a>
+  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&animate=false" alt="GitHub stats"></a>
 </p>
 
 <p align="center">
@@ -66,6 +66,7 @@ All options are query parameters.
 | `deleteSpeed` | `18` | Milliseconds per deleted character |
 | `hold` | `2000` | Milliseconds the finished scene stays on screen |
 | `repeat` | `true` | Loop the animation (`false` freezes on the last scene) |
+| `animate` | `true` | `false` renders the last scene as a static block (only the cursor blinks) |
 
 ### Color overrides
 
@@ -107,6 +108,7 @@ Try all four styles live on the [demo page](https://terminal-typing-svg.vaidikv.
 | `fontSize` | `15`           | font size in px                      |
 | `repeat`   | `true`         | loop the animation                   |
 | `hold`     | `3500`         | ms to hold the finished card         |
+| `demo`     | (off)          | `demo=1` renders labeled sample data (for previews) |
 
 Stats are fetched live from the GitHub API and cached for 6 hours. Self-hosters can set a `GITHUB_TOKEN` secret on the worker to raise GitHub's API rate limits.
 
