@@ -241,10 +241,12 @@ export const DEMO_HTML = `<!DOCTYPE html>
   }
   function refreshStats() {
     var u = buildURL();
+    var names = { heatmap: "GitHub contribution heatmap", terminal: "GitHub stats",
+      dashboard: "GitHub dashboard", blueprint: "GitHub blueprint" };
     document.getElementById("s_preview").src = u;
     document.getElementById("s_url").textContent = u;
     document.getElementById("s_md").textContent =
-      "[![GitHub stats](" + u + ")](https://github.com/VaidikV/terminal-typing-svg)";
+      "[![" + names[style.value] + "](" + u + ")](https://github.com/VaidikV/terminal-typing-svg)";
   }
   [username, style, theme].forEach(function (el) {
     el.addEventListener("input", refreshStats);
