@@ -106,6 +106,39 @@ async function resolveFont(fontParam) {
 const USERNAME_RE = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/;
 const STATS_TTL = 21600; // 6 hours
 
+// Sample profile stats used with demo=1. Kept consistent with sampleDays
+// below so the demo page's cards agree with each other.
+const SAMPLE_STATS = { stars: 128, repos: 34, prs: 42, issues: 17, followers: 256 };
+const SAMPLE_PROFILE = { stars: SAMPLE_STATS.stars, prs: SAMPLE_STATS.prs, issues: SAMPLE_STATS.issues };
+
+// Deterministic sample contribution history (16 weeks ending today) for
+// demo=1: an organic-looking grid with a current 7-day streak.
+function sampleDays() {
+  let seed = 20260927;
+  const rand = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const days = [];
+  const now = new Date();
+  const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  for (let i = 111; i >= 0; i--) {
+    const d = new Date(todayUTC);
+    d.setUTCDate(d.getUTCDate() - i);
+    const wave = Math.sin(i / 9) * 0.5 + 0.5;
+    let count;
+    if (i < 7) {
+      count = 2 + Math.floor(rand() * 9); // current streak
+    } else {
+      const r = rand();
+      count = r < 0.28 ? 0 : Math.floor(r * wave * 13) + 1;
+    }
+    const level = count === 0 ? 0 : Math.min(4, 1 + Math.floor(count / 4));
+    days.push({ date: d.toISOString().slice(0, 10), count, level });
+  }
+  return days;
+}
+
 async function statsResponse(url, env) {
   const username = (url.searchParams.get("username") || "").trim();
   if (!USERNAME_RE.test(username)) {
@@ -115,12 +148,19 @@ async function statsResponse(url, env) {
     });
   }
   const style = (url.searchParams.get("style") || "terminal").toLowerCase();
+  // demo=1 renders deterministic sample data (labeled on the card) so the
+  // demo page shows a lively preview without depending on a real account.
+  const demoMode = url.searchParams.get("demo") === "1";
   if (style === "heatmap") {
     let days = null;
-    try {
-      days = await getContributions(username);
-    } catch {
-      days = null;
+    if (demoMode) {
+      days = sampleDays();
+    } else {
+      try {
+        days = await getContributions(username);
+      } catch {
+        days = null;
+      }
     }
     if (!days || days.length < 60) {
       return new Response(errorSVG("could not fetch GitHub contributions, try again soon."), {
@@ -131,10 +171,14 @@ async function statsResponse(url, env) {
     // Profile stats for the heatmap's left column (cached 6h, same as
     // the other styles, so this adds no extra GitHub API load).
     let stats = null;
-    try {
-      stats = await getStats(username, env);
-    } catch {
-      stats = null;
+    if (demoMode) {
+      stats = SAMPLE_PROFILE;
+    } else {
+      try {
+        stats = await getStats(username, env);
+      } catch {
+        stats = null;
+      }
     }
     const { svg } = generateHeatmapSVG(username, days, url.searchParams, {
       stars: stats ? stats.stars : null,
@@ -149,10 +193,14 @@ async function statsResponse(url, env) {
     });
   }
   let data = null;
-  try {
-    data = await getStats(username, env);
-  } catch {
-    data = null;
+  if (demoMode) {
+    data = { username, ...SAMPLE_STATS };
+  } else {
+    try {
+      data = await getStats(username, env);
+    } catch {
+      data = null;
+    }
   }
   if (!data) {
     return new Response(errorSVG("could not fetch GitHub stats, try again soon."), {
