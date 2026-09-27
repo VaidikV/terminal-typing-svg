@@ -1,8 +1,8 @@
 // Contribution heatmap card. Pure function of parsed contribution days ->
 // SVG string. No I/O. Days: [{date: "YYYY-MM-DD", count, level}].
 // Level is GitHub's 0-4 intensity bucket; count is the exact contributions.
-// Layout (560 x 248, matches the terminal banner width):
-//   left   - compact profile stats (stars, commits, PRs, issues)
+// Layout (560 x 224, matches the terminal banner width):
+//   left   - compact profile stats (stars, PRs, issues)
 //   middle - 16x7 grid; its left edge fades in over the first three
 //            columns, the right edge (most recent days) stays fully clear
 //   right  - headline window stats (contributions, day streak)
@@ -16,14 +16,14 @@ const WEEKS = 16;
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const CARD_W = 560;
-const CARD_H = 248;
+const CARD_H = 224;
 const PAD = 20;
 const ROWS_X = PAD;          // left stats column
 const GRID_X = 160;          // contribution grid
 const NUM_X = 435;           // right headline numbers
-const GRID_TOP = 96.5;
-const MONTH_Y = 88.5;
-const LEGEND_Y = 215.5;
+const GRID_TOP = 70;
+const MONTH_Y = 61.5;
+const LEGEND_Y = 190;
 const SQ = 11;
 const GAP = 3;
 const STEP = SQ + GAP;
@@ -129,7 +129,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
     [profile?.issues, "issues"],
   ];
   rows.forEach(([value, label], i) => {
-    const y = 108 + i * 38;
+    const y = 82 + i * 38;
     parts.push(
       `  <text x="${ROWS_X}" y="${y}" font-family="${SANS}" font-size="15">` +
         `<tspan font-weight="700" fill="${p.t.title}">${fmt(value)}</tspan>` +
@@ -180,8 +180,8 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
       `font-weight="800" fill="${p.t.title}">${fmt(value)}</text>\n` +
     `  <text x="${NUM_X}" y="${y + 18}" font-family="${SANS}" font-size="11" ` +
       `fill="${muted}" opacity="0.6">${label}</text>`;
-  parts.push(headline(total, "contributions", 118));
-  parts.push(headline(streak, "day streak", 174));
+  parts.push(headline(total, "contributions", 96));
+  parts.push(headline(streak, "day streak", 152));
 
   parts.push("</svg>");
   return { svg: parts.join("\n") + "\n" };
