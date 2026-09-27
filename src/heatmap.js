@@ -122,7 +122,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
   );
   parts.push(
     `  <text x="${PAD}" y="${PAD + 13}" font-family="${SANS}" font-size="13">` +
-      `<tspan font-weight="700" fill="${p.t.title}">${esc(username)}</tspan>` +
+      `<tspan font-weight="700" fill="${p.t.command}">${esc(username)}</tspan>` +
       `<tspan fill="${muted}" opacity="0.6"> \u00b7 last ${WEEKS} weeks` +
       `${sample ? " \u00b7 sample data" : ""}</tspan></text>`
   );
