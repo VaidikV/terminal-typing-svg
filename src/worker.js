@@ -159,14 +159,6 @@ async function getStats(username, env) {
 
   const own = repos.filter((r) => !r.fork);
   const stars = own.reduce((s, r) => s + (r.stargazers_count || 0), 0);
-  const langCount = {};
-  for (const r of own) {
-    if (r.language) langCount[r.language] = (langCount[r.language] || 0) + 1;
-  }
-  const langs = Object.entries(langCount)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([name, count]) => ({ name, count }));
 
   const data = {
     username: user.login,
@@ -175,7 +167,6 @@ async function getStats(username, env) {
     prs: prs ? prs.total_count : 0,
     issues: issues ? issues.total_count : 0,
     followers: user.followers,
-    langs,
   };
   const res = new Response(JSON.stringify(data), {
     headers: {
