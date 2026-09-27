@@ -117,6 +117,8 @@ export function generateSVG(rawQuery, opts = {}) {
   const fontFamily = (opts.fontFamily || "JetBrains Mono").replace(/["<>]/g, "");
   const stack = `'${fontFamily}', ${FONT_STACK_BASE}`;
   const p = buildParams(rawQuery);
+  const q = rawQuery instanceof URLSearchParams ? rawQuery : new URLSearchParams(rawQuery);
+  const animated = checkBool(q.get("animate"), true);
   const { error, scenes } = parseScenes(
     rawQuery instanceof URLSearchParams
       ? rawQuery.get("lines")
@@ -163,6 +165,34 @@ export function generateSVG(rawQuery, opts = {}) {
       `  <text x="92" y="28" font-family="${stack}" font-size="12" fill="${p.t.title}">${esc(p.title)}</text>\n` +
       `  <line x1="12" y1="${CHROME_H}" x2="${width - 12}" y2="${CHROME_H}" stroke="${p.t.divider}"/>`
   );
+
+  // Static mode: render the last scene as a plain block of text with only
+  // a blinking cursor. No typing, no fades, no deletes.
+  if (!animated) {
+    const scene = scenes[n - 1];
+    const y = CONTENT_TOP;
+    const tspans =
+      promptSpans.map(([txt, c]) => `<tspan fill="${c}">${esc(txt)}</tspan>`).join("") +
+      `<tspan fill="${p.t.command}" font-weight="600">${esc(scene.cmd)}</tspan>` +
+      `<tspan fill="${p.t.accent}">\u2588` +
+      `<animate attributeName="opacity" values="1;0" keyTimes="0;0.5" calcMode="discrete" ` +
+      `dur="1.06s" repeatCount="indefinite" begin="0s"/>` +
+      `</tspan>`;
+    parts.push(`  <g>`);
+    parts.push(
+      `    <text x="${PAD_X}" y="${y}" font-family="${stack}" font-size="${p.fontSize}">${tspans}</text>`
+    );
+    scene.out.forEach((out, k) => {
+      const oy = y + (k + 1) * LINE_H;
+      parts.push(
+        `    <text x="${PAD_X}" y="${oy}" font-family="${stack}" font-size="${p.fontSize}" ` +
+          `fill="${p.t.output}">${esc(out)}</text>`
+      );
+    });
+    parts.push("  </g>");
+    parts.push("</svg>");
+    return { svg: parts.join("\n") + "\n" };
+  }
 
   scenes.forEach((scene, i) => {
     const nChars = promptText.length + scene.cmd.length + 1; // + block cursor
