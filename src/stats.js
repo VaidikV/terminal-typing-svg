@@ -90,6 +90,14 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
 
   const lines =
     1 + stats.length + 1 + (langs.length ? 1 + langs.length : 0);
+
+  // Language section columns sized from the longest language name so the
+  // count and bars never overlap the labels.
+  const BAR_H = 10;
+  const maxNameW = Math.max(0, ...langs.map((l) => l.name.length)) * p.adv;
+  const langCountX = Math.ceil(PAD_X + maxNameW + 20);
+  const barX = Math.ceil(langCountX + 56);
+
   const width = Math.max(
     p.minWidth,
     480,
@@ -102,13 +110,6 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     )
   );
   const height = CHROME_H + lines * LINE_H + 26;
-
-  // Language section columns sized from the longest language name so the
-  // count and bars never overlap the labels.
-  const BAR_H = 10;
-  const maxNameW = Math.max(0, ...langs.map((l) => l.name.length)) * p.adv;
-  const langCountX = Math.ceil(PAD_X + maxNameW + 20);
-  const barX = Math.ceil(langCountX + 56);
 
   // ---- timeline ----
   const nTypeChars = promptText.length + cmd.length + 1;
