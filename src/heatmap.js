@@ -123,7 +123,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
   parts.push(
     `  <text x="${PAD}" y="${PAD + 13}" font-family="${SANS}" font-size="13">` +
       `<tspan font-weight="700" fill="${p.t.command}">${esc(username)}</tspan>` +
-      `<tspan fill="${muted}" opacity="0.6"> \u00b7 last ${WEEKS} weeks` +
+      `<tspan fill="${muted}" opacity="0.85"> \u00b7 last ${WEEKS} weeks` +
       `${sample ? " \u00b7 sample data" : ""}</tspan></text>`
   );
 
@@ -138,7 +138,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
     parts.push(
       `  <text x="${ROWS_X}" y="${y}" font-family="${SANS}" font-size="15">` +
         `<tspan font-weight="700" fill="${num}">${fmt(value)}</tspan>` +
-        `<tspan font-size="11" fill="${muted}" opacity="0.6"> ${label}</tspan></text>`
+        `<tspan font-size="11" fill="${muted}" opacity="0.85"> ${label}</tspan></text>`
     );
   });
 
@@ -146,7 +146,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
   labels.forEach((l) => {
     parts.push(
       `  <text x="${GRID_X + l.ci * STEP}" y="${MONTH_Y}" font-family="${SANS}" ` +
-        `font-size="9" fill="${muted}" opacity="0.55">${l.text}</text>`
+        `font-size="9" fill="${muted}" opacity="0.85">${l.text}</text>`
     );
   });
 
@@ -167,7 +167,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
   let lx = GRID_X;
   parts.push(
     `  <text x="${lx}" y="${LEGEND_Y}" font-family="${SANS}" font-size="10" ` +
-      `fill="${muted}" opacity="0.6">Less</text>`
+      `fill="${muted}" opacity="0.85">Less</text>`
   );
   lx += 34;
   scale.forEach((c) => {
@@ -176,7 +176,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
   });
   parts.push(
     `  <text x="${lx + 2}" y="${LEGEND_Y}" font-family="${SANS}" font-size="10" ` +
-      `fill="${muted}" opacity="0.6">More</text>`
+      `fill="${muted}" opacity="0.85">More</text>`
   );
 
   // Right: headline window stats.
@@ -184,7 +184,7 @@ export function generateHeatmapSVG(username, days, rawQuery, profile) {
     `  <text x="${NUM_X}" y="${y}" font-family="${SANS}" font-size="26" ` +
       `font-weight="800" fill="${num}" opacity="0.85">${fmt(value)}</text>\n` +
     `  <text x="${NUM_X}" y="${y + 18}" font-family="${SANS}" font-size="11" ` +
-      `fill="${muted}" opacity="0.6">${label}</text>`;
+      `fill="${muted}" opacity="0.85">${label}</text>`;
   parts.push(headline(total, "contributions", 96));
   parts.push(headline(streak, "day streak", 152));
 
