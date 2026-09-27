@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&v=2" alt="GitHub stats"></a>
+  <a href="https://terminal-typing-svg.vaidikv.workers.dev/demo#stats"><img src="https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&v=3" alt="GitHub stats"></a>
 </p>
 
 <p align="center">
