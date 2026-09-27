@@ -275,13 +275,21 @@ async function getStats(username, env) {
     fetch(`https://api.github.com${path}`, { headers }).then((r) =>
       r.ok ? r.json() : null
     );
-  const [user, repos, prs, issues] = await Promise.all([
-    gh("user", `/users/${username}`),
-    gh("repos", `/users/${username}/repos?per_page=100&type=owner&sort=pushed`),
-    gh("prs", `/search/issues?q=author:${username}+type:pr&per_page=1`),
-    gh("issues", `/search/issues?q=author:${username}+type:issue&per_page=1`),
-  ]);
-  if (!user || !Array.isArray(repos)) return null;
+  const load = () =>
+    Promise.all([
+      gh("user", `/users/${username}`),
+      gh("repos", `/users/${username}/repos?per_page=100&type=owner&sort=pushed`),
+      gh("prs", `/search/issues?q=author:${username}+type:pr&per_page=1`),
+      gh("issues", `/search/issues?q=author:${username}+type:issue&per_page=1`),
+    ]);
+  let [user, repos, prs, issues] = await load();
+  if (!user || !Array.isArray(repos)) {
+    // GitHub sometimes rate-limits the worker's shared egress IP: one retry
+    // after a short wait before giving up and showing the error card.
+    await new Promise((r) => setTimeout(r, 1500));
+    [user, repos, prs, issues] = await load();
+    if (!user || !Array.isArray(repos)) return null;
+  }
 
   const own = repos.filter((r) => !r.fork);
   const stars = own.reduce((s, r) => s + (r.stargazers_count || 0), 0);
