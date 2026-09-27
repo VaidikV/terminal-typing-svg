@@ -69,8 +69,8 @@ export const DEMO_HTML = `<!DOCTYPE html>
   Prefix a line with <code>$&nbsp;</code> to type it as a command, following lines become its output.
   Separate lines with <code>;</code>. Inspired by
   <a href="https://github.com/DenverCoder1/readme-typing-svg" style="color:#58a6ff">readme-typing-svg</a>.</p>
-  <p class="new">✨ New: <a href="/stats?username=VaidikV" style="color:#58a6ff">terminal-style GitHub stats</a>
-  — try <code>/stats?username=yourname</code></p>
+  <p class="new">✨ New: <a href="/stats?username=VaidikV" style="color:#58a6ff">terminal-style GitHub stats</a>,
+  try <code>/stats?username=yourname</code></p>
 
   <div class="card">
     <h2>Live preview</h2>
