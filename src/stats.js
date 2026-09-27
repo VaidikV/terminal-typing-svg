@@ -2,17 +2,15 @@
 // params -> animated SVG string. No I/O. Shares the terminal chrome, themes,
 // and fonts with the typing generator.
 //
-// Designed to look like real terminal output (neofetch-style): the command
-// types, a spinner "fetches" from the API, then stat rows and a colored
-// ASCII bar chart print line by line, exactly as a CLI would render them.
-// With animate=false the full card renders statically (no SMIL at all).
+// Compact two-column layout: the command up top, icon stat rows on the left,
+// a colored ASCII top-languages chart on the right, and a fresh prompt with
+// a blinking cursor at the bottom. With animate=false everything renders
+// statically (only the cursor blinks).
 import {
   THEMES,
   FONT_STACK_BASE,
   DEFAULTS,
   CHROME_H,
-  CONTENT_TOP,
-  LINE_H,
   PAD_X,
   esc,
   checkPositiveInt,
@@ -33,21 +31,27 @@ const LANG_COLORS = {
 };
 
 const STAT_DEFS = [
-  ["Stars earned", "stars"],
-  ["Repositories", "repos"],
-  ["Pull requests", "prs"],
-  ["Issues", "issues"],
-  ["Followers", "followers"],
+  ["Stars earned", "stars", "star"],
+  ["Repositories", "repos", "repo"],
+  ["Pull requests", "prs", "pr"],
+  ["Issues", "issues", "issue"],
+  ["Followers", "followers", "person"],
 ];
 
 const FADE = 500;
 const RESTART_GAP = 600;
-const SPINNER = ["|", "/", "-", "\\"];
-const SPIN_STEP = 130;
-const SPIN_CYCLES = 2;
-const BAR_W = 14; // bar width in characters
+const BAR_W = 10; // bar width in characters
 const FULL = "\u2588"; // █
 const LIGHT = "\u2591"; // ░
+const ICON = 15; // icon box px
+
+const ICON_PATHS = {
+  star: `<polygon points="8,1.5 9.65,5.73 14.18,5.99 10.66,8.87 11.82,13.26 8,10.8 4.18,13.26 5.34,8.87 1.82,5.99 6.35,5.73"/>`,
+  repo: `<rect x="2.5" y="2.5" width="11" height="11" rx="2"/>`,
+  pr: `<circle cx="4.5" cy="4.5" r="2"/><circle cx="4.5" cy="11.5" r="2"/><circle cx="11.5" cy="8" r="2"/><path d="M4.5 6.5v3"/><path d="M6.4 5.2C8.2 5.8 8.6 6.6 9.6 7.2"/>`,
+  issue: `<circle cx="8" cy="8" r="5.5"/><path d="M8 5.2v3.2"/><circle cx="8" cy="11.2" r="1.1" fill="ACCENT" stroke="none"/>`,
+  person: `<circle cx="8" cy="5.3" r="2.6"/><path d="M3.2 13.6c.6-3 2.4-4.4 4.8-4.4s4.2 1.4 4.8 4.4"/>`,
+};
 
 export function langColor(name, fallback) {
   return LANG_COLORS[name] || fallback;
@@ -62,6 +66,8 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   const hold = checkPositiveInt(q.get("hold"), 4000);
   const animated = checkBool(q.get("animate"), true);
   const endV = repeat ? "0" : "1";
+  const fs = p.fontSize;
+  const adv = fs * 0.6;
 
   const cmd = `gh stats ${data.username}`;
   const promptText = `${p.prompt}:~$ `;
@@ -74,8 +80,9 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   const promptTspans = (cursor) =>
     promptSpans.map(([txt, c]) => `<tspan fill="${c}">${esc(txt)}</tspan>`).join("") + cursor;
 
-  const stats = STAT_DEFS.map(([label, key]) => ({
+  const stats = STAT_DEFS.map(([label, key, icon]) => ({
     label,
+    icon,
     value: Number(data[key] || 0).toLocaleString("en-US"),
   }));
   const langs = (data.langs || []).slice(0, 5).map((l) => ({
@@ -86,31 +93,30 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
   const maxLang = Math.max(1, ...langs.map((l) => l.count));
   const nameCol = Math.max(0, ...langs.map((l) => l.name.length));
 
-  const width = Math.max(620, p.minWidth);
-
   // ---- layout ----
-  const yCmd = CONTENT_TOP;
-  const yFetch = CONTENT_TOP + LINE_H;
-  const yHead = CONTENT_TOP + 2 * LINE_H;
-  const yDashes = CONTENT_TOP + 3 * LINE_H;
-  const yStat = (i) => CONTENT_TOP + (4 + i) * LINE_H;
-  const yLangLabel = CONTENT_TOP + 10 * LINE_H;
-  const yLang = (j) => CONTENT_TOP + (11 + j) * LINE_H;
-  const yPrompt2 = CONTENT_TOP + (langs.length ? 17 : 11) * LINE_H;
-  const height = Math.ceil(yPrompt2 + 44);
+  const COL2_X = 300;
+  const yCmd = 72;
+  const yStat = (i) => 102 + i * 26;
+  const yLangLabel = 102;
+  const yLang = (j) => 128 + j * 26;
+  const yPrompt2 = 258;
+  const height = yPrompt2 + 34;
+
+  const labelX = PAD_X + ICON + 9;
+  const maxLabelW = Math.max(...stats.map((s) => s.label.length)) * adv;
+  const valueX = Math.ceil(labelX + maxLabelW + 18);
+  const barX = COL2_X + nameCol * adv + 12;
+  const countX = Math.ceil(barX + (BAR_W + 1) * adv + 10);
+  const width = Math.max(560, p.minWidth, Math.ceil(countX + 28));
 
   // ---- timeline (animated mode) ----
   const nTypeChars = promptText.length + cmd.length + 1;
   const typeDur = nTypeChars * p.typingSpeed;
-  const tFetch = typeDur + 250;
-  const fetchDur = SPINNER.length * SPIN_STEP * SPIN_CYCLES;
-  const tFetchEnd = tFetch + fetchDur;
-  const tHead = tFetchEnd + 120;
-  const tStat = (i) => tHead + 180 + i * 140;
-  const tLangLabel = tStat(stats.length - 1) + 300;
-  const tLang = (j) => tLangLabel + 180 + j * 170;
-  const tPrompt2 = langs.length ? tLang(langs.length - 1) + 400 : tStat(stats.length - 1) + 400;
-  const contentEnd = tPrompt2 + 200;
+  const tStat = (i) => typeDur + 250 + i * 130;
+  const tLangLabel = tStat(stats.length - 1) + 250;
+  const tLang = (j) => tLangLabel + 150 + j * 130;
+  const tPrompt2 = langs.length ? tLang(langs.length - 1) + 300 : tStat(stats.length - 1) + 300;
+  const contentEnd = tPrompt2 + 150;
   const totalDur = contentEnd + hold + FADE;
   const k = (t) => (t / totalDur).toFixed(4);
   const kOut = k(totalDur - FADE);
@@ -126,6 +132,12 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
       `        values="${values}" keyTimes="${keyTimes}"/>\n${inner}\n    </g>`
     );
   };
+
+  const iconSvg = (name, x, y) =>
+    `<svg x="${x}" y="${y}" width="${ICON}" height="${ICON}" viewBox="0 0 16 16" fill="none" ` +
+    `stroke="${p.t.accent}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">` +
+    ICON_PATHS[name].replaceAll("ACCENT", p.t.accent) +
+    `</svg>`;
 
   const parts = [];
   parts.push('<?xml version="1.0" encoding="UTF-8"?>');
@@ -158,7 +170,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
 
   // Command line: typed via textPath when animated, plain text when static.
   if (animated) {
-    const fullLen = nTypeChars * p.adv + 14;
+    const fullLen = nTypeChars * adv + 14;
     const d0 = `M ${PAD_X},${yCmd} h0`;
     const d1 = `M ${PAD_X},${yCmd} h${fullLen.toFixed(1)}`;
     const begin = repeat ? `0s;outro.end+${RESTART_GAP}ms` : "0s";
@@ -168,68 +180,40 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
       `<tspan fill="${p.t.accent}">\u2588` +
       `<animate attributeName="opacity" values="1;0" keyTimes="0;0.5" calcMode="discrete" ` +
       `dur="1.06s" repeatCount="indefinite" ` +
-      `begin="tpa0.begin+${typeDur}ms" end="tpa0.begin+${tFetch}ms"/>` +
+      `begin="tpa0.begin+${typeDur}ms" end="tpa0.begin+${typeDur + 250}ms"/>` +
       `</tspan>`;
     parts.push(
       `    <path id="tp0" d="${d0}" fill="none">\n` +
         `      <animate id="tpa0" attributeName="d" begin="${begin}" dur="${totalDur}ms" fill="freeze"\n` +
         `        values="${d0} ; ${d1} ; ${d1}" keyTimes="0;${k(typeDur)};1"/>\n` +
         `    </path>\n` +
-        `    <text font-family="${stack}" font-size="${p.fontSize}">\n` +
+        `    <text font-family="${stack}" font-size="${fs}">\n` +
         `      <textPath xlink:href="#tp0" href="#tp0">${tspans}</textPath>\n` +
         `    </text>`
     );
-
-    // Spinner + fetching line (vanishes when output prints).
-    const tHideFetch = tHead;
-    parts.push(`    <g opacity="0">\n` +
-      `      <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
-      `        values="0;0;1;1;0;0" keyTimes="0;${k(tFetch)};${k(tFetch + 80)};${k(tHideFetch)};${k(tHideFetch + 250)};1"/>\n` +
-      `      <text x="${PAD_X}" y="${yFetch}" font-family="${stack}" font-size="${p.fontSize}" fill="${p.t.output}">fetching stats from api.github.com </text>`);
-    SPINNER.forEach((ch, f) => {
-      const times = [];
-      for (let r = 0; r < SPIN_CYCLES; r++) {
-        times.push(k(tFetch + (r * SPINNER.length + f) * SPIN_STEP));
-        times.push(k(tFetch + (r * SPINNER.length + f + 1) * SPIN_STEP));
-      }
-      parts.push(
-        `      <text x="${PAD_X + 34 * p.adv}" y="${yFetch}" font-family="${stack}" font-size="${p.fontSize}" font-weight="600" fill="${p.t.accent}" opacity="0">${ch === "\\" ? "&#92;" : ch}\n` +
-          `        <animate attributeName="opacity" begin="tpa0.begin" dur="${totalDur}ms" fill="freeze"\n` +
-          `          calcMode="discrete" values="0;1;0;1;0;0" keyTimes="0;${times[0]};${times[1]};${times[2]};${times[3]};1"/>\n` +
-          `      </text>`
-      );
-    });
-    parts.push("    </g>");
   } else {
     parts.push(
-      `    <text x="${PAD_X}" y="${yCmd}" font-family="${stack}" font-size="${p.fontSize}">` +
+      `    <text x="${PAD_X}" y="${yCmd}" font-family="${stack}" font-size="${fs}">` +
         promptTspans("") +
         `<tspan fill="${p.t.command}" font-weight="600">${esc(cmd)}</tspan></text>`
     );
   }
 
-  // neofetch-style header: user@host + dashes.
-  const dashes = "-".repeat(p.prompt.length);
-  parts.push(show(
-    `      <text x="${PAD_X}" y="${yHead}" font-family="${stack}" font-size="${p.fontSize}" font-weight="600" fill="${p.t.promptUser}">${esc(p.prompt)}</text>\n` +
-      `      <text x="${PAD_X}" y="${yDashes}" font-family="${stack}" font-size="${p.fontSize}" fill="${p.t.output}" opacity="0.55">${dashes}</text>`,
-    tHead, 120
-  ));
-
-  // Stat rows: "Label: value".
+  // Stat rows with icons.
   stats.forEach((s, i) => {
     parts.push(show(
-      `      <text x="${PAD_X}" y="${yStat(i)}" font-family="${stack}" font-size="${p.fontSize}">` +
-        `<tspan fill="${p.t.output}">${esc(s.label)}: </tspan>` +
-        `<tspan fill="${p.t.accent}" font-weight="600">${esc(s.value)}</tspan></text>`,
+      `      ${iconSvg(s.icon, PAD_X, yStat(i) - 12)}\n` +
+        `      <text x="${labelX}" y="${yStat(i)}" font-family="${stack}" font-size="${fs}">` +
+        `<tspan fill="${p.t.output}">${esc(s.label)}</tspan></text>\n` +
+        `      <text x="${valueX}" y="${yStat(i)}" font-family="${stack}" font-size="${fs}" font-weight="600" fill="${p.t.accent}">${esc(s.value)}</text>`,
       tStat(i)
     ));
   });
 
-  // Top languages as a colored ASCII bar chart.
+  // Top languages chart on the right.
   if (langs.length) {
     parts.push(show(
-      `      <text x="${PAD_X}" y="${yLangLabel}" font-family="${stack}" font-size="${p.fontSize}" font-weight="600" fill="${p.t.output}">Top languages</text>`,
+      `      <text x="${COL2_X}" y="${yLangLabel}" font-family="${stack}" font-size="${fs}" font-weight="600" fill="${p.t.output}">Top languages</text>`,
       tLangLabel, 120
     ));
     langs.forEach((l, j) => {
@@ -237,7 +221,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
       const bar = FULL.repeat(filled) + LIGHT.repeat(BAR_W - filled);
       const namePad = " ".repeat(nameCol - l.name.length);
       parts.push(show(
-        `      <text x="${PAD_X}" y="${yLang(j)}" font-family="${stack}" font-size="${p.fontSize}">` +
+        `      <text x="${COL2_X}" y="${yLang(j)}" font-family="${stack}" font-size="${fs}">` +
           `<tspan fill="${p.t.output}">${esc(l.name)}${namePad}  </tspan>` +
           `<tspan fill="${l.color}">${bar}</tspan>` +
           `<tspan fill="${p.t.accent}" font-weight="600"> ${l.count}</tspan></text>`,
@@ -246,7 +230,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     });
   }
 
-  // Final prompt cursor: always blinking, the one living element in static mode.
+  // Fresh prompt with blinking cursor.
   const cursorBegin = animated ? `tpa0.begin+${tPrompt2}ms` : "0s";
   const cursorEnd = animated ? ` end="tpa0.begin+${totalDur - FADE}ms"` : "";
   const cursor =
@@ -255,7 +239,7 @@ export function generateStatsSVG(data, rawQuery, opts = {}) {
     `dur="1.06s" repeatCount="indefinite" begin="${cursorBegin}"${cursorEnd}/>` +
     `</tspan>`;
   parts.push(show(
-    `      <text x="${PAD_X}" y="${yPrompt2}" font-family="${stack}" font-size="${p.fontSize}">${promptTspans(cursor)}</text>`,
+    `      <text x="${PAD_X}" y="${yPrompt2}" font-family="${stack}" font-size="${fs}">${promptTspans(cursor)}</text>`,
     tPrompt2, 200
   ));
 
