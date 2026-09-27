@@ -6,7 +6,9 @@
 [![GitHub stars](https://img.shields.io/github/stars/VaidikV/terminal-typing-svg?style=flat)](https://github.com/VaidikV/terminal-typing-svg/stargazers)
 [![Live demo](https://img.shields.io/badge/demo-live-blue)](https://terminal-typing-svg.vaidikv.workers.dev/demo)
 
-A terminal-style typing animation for your GitHub profile README. A readme typing SVG generator with a real terminal look: give it lines of text, get back an SVG that types them like commands in a macOS terminal window, with a colored prompt, typed commands, fading outputs, and a blinking block cursor.
+A terminal-style typing animation for your GitHub profile README. Give it lines of text, get back an SVG that types them like commands in a macOS terminal window: colored prompt, typed commands, fading outputs, blinking block cursor.
+
+Also includes a `/stats` endpoint: an animated terminal-style GitHub stats card (stars, PRs, issues, followers, top-language bars) in the same design.
 
 Inspired by [DenverCoder1/readme-typing-svg](https://github.com/DenverCoder1/readme-typing-svg), rebuilt from scratch as a terminal scene on serverless infrastructure: no PHP server to babysit.
 
@@ -60,6 +62,27 @@ Any theme color can be overridden per request (hex, with or without `#`):
 `bg1`, `bg2`, `border`, `promptUser`, `promptPath`, `promptDollar`, `command`, `output`, `accent` (cursor), `titleColor`.
 
 Example: `&theme=tokyonight&accent=ff0000&promptUser=00ff00`
+
+## GitHub stats terminal
+
+`/stats` renders a terminal running `gh stats`, animated in the same style: the command types out, stats fade in one by one, then top-language bars grow. It shares the themes, color overrides, fonts, and prompt/title parameters above.
+
+```md
+[![GitHub stats](https://terminal-typing-svg.vaidikv.workers.dev/stats?username=VaidikV&theme=github-dark)](https://github.com/VaidikV/terminal-typing-svg)
+```
+
+| Parameter  | Default        | Description                          |
+| ---------- | -------------- | ------------------------------------ |
+| `username` | (required)     | GitHub username                      |
+| `theme`    | `github-dark`  | one of the 5 themes, plus overrides  |
+| `prompt`   | `user@github`  | prompt user                          |
+| `title`    | `zsh`          | window title                         |
+| `font`     | JetBrains Mono | any Google Font                      |
+| `fontSize` | `15`           | font size in px                      |
+| `repeat`   | `true`         | loop the animation                   |
+| `hold`     | `3500`         | ms to hold the finished card         |
+
+Stats are fetched live from the GitHub API and cached for 6 hours. Self-hosters can set a `GITHUB_TOKEN` secret on the worker to raise GitHub's API rate limits.
 
 ## How it works
 
