@@ -4,6 +4,8 @@
 import { generateSVG, errorSVG } from "./generator.js";
 import { generateStatsSVG } from "./stats.js";
 import { generateHeatmapSVG } from "./heatmap.js";
+import { generateDashboardSVG } from "./dashboard.js";
+import { generateBlueprintSVG } from "./blueprint.js";
 import { DEMO_HTML } from "./demo.js";
 
 const UA =
@@ -146,14 +148,24 @@ async function statsResponse(url, env) {
       headers: { "content-type": "image/svg+xml;charset=UTF-8" },
     });
   }
+  const respond = (svg) =>
+    new Response(svg, {
+      headers: {
+        "content-type": "image/svg+xml;charset=UTF-8",
+        "cache-control": `public, max-age=${STATS_TTL}`,
+      },
+    });
+  if (style === "dashboard") {
+    const { svg } = generateDashboardSVG(data, url.searchParams);
+    return respond(svg);
+  }
+  if (style === "blueprint") {
+    const { svg } = generateBlueprintSVG(data, url.searchParams);
+    return respond(svg);
+  }
   const { fontFamily, fontCSS } = await resolveFont(url.searchParams.get("font"));
   const { svg } = generateStatsSVG(data, url.searchParams, { fontFamily, fontCSS });
-  return new Response(svg, {
-    headers: {
-      "content-type": "image/svg+xml;charset=UTF-8",
-      "cache-control": `public, max-age=${STATS_TTL}`,
-    },
-  });
+  return respond(svg);
 }
 
 // Fetch the public contributions calendar page for a username and parse it
